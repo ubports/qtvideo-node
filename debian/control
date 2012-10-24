@@ -1,0 +1,24 @@
+Source: qtvideonode-plugin
+Section: libs
+Priority: optional
+Maintainer: The Amazi team <phablet@lists.canonical.com>
+XSBC-Original-Maintainer: Guenter Schwann <guenter.schwann@canonical.com>
+Build-Depends: debhelper (>= 8.0.0),
+               libgl-dev,
+               libgles2-mesa-dev,
+               libhybris-dev,
+               libpulse-dev,
+               qtmultimedia,
+               pkg-config
+Standards-Version: 3.9.3
+Vcs-Bzr: https://code.launchpad.net/~amanzi-team/barrydale/cameraplugin-aal
+
+Package: qtvideonode-plugin
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         libhybris,
+         qtmultimedia
+Description: Plugin for showing camera viewfinder in Qt
+  Plugin for showing camera viewfinder in Qt
+
