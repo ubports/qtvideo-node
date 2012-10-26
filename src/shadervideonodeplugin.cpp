@@ -64,20 +64,19 @@ protected:
     virtual const char *fragmentShader() const {
         static const char *shader =
                 "#extension GL_OES_EGL_image_external : require      \n"
-                "precision mediump float;                            \n"
-                "varying vec2 qt_TexCoord;                           \n"
+                "uniform samplerExternalOES sTexture;                \n"
                 "uniform lowp float opacity;                         \n"
-                "uniform samplerExternalOES rgbTexture;              \n"
+                "varying highp vec2 qt_TexCoord;                     \n"
                 "void main()                                         \n"
                 "{                                                   \n"
-                "  gl_FragColor = texture2D( rgbTexture, qt_TexCoord );\n"
+                "  gl_FragColor = texture2D( sTexture, qt_TexCoord );\n"
                 "}                                                   \n";
         return shader;
     }
 
     virtual void initialize() {
         m_id_matrix = program()->uniformLocation("qt_Matrix");
-        m_id_Texture = program()->uniformLocation("rgbTexture");
+        m_id_Texture = program()->uniformLocation("sTexture");
         m_id_opacity = program()->uniformLocation("opacity");
     }
 
