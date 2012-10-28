@@ -17,7 +17,6 @@ Package: qtvideonode-plugin
 Architecture: armel armhf
 Depends: ${shlibs:Depends},
          ${misc:Depends},
-         libhybris,
          qtmultimedia
 Description: Plugin for showing camera viewfinder in Qt
   Plugin for showing camera viewfinder in Qt
