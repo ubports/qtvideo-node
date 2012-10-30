@@ -1,8 +1,9 @@
 qtvideonode-plugin (0.1.1) UNRELEASED; urgency=low
 
   * Minor shader polishing
+  * Fix shader to fix preview artifacts
 
- -- Guenter Schwann <guenter.schwann@canonical.com>  Fri, 26 Oct 2012 15:27:25 +0100
+ -- Guenter Schwann <guenter.schwann@canonical.com>  Tue, 30 Oct 2012 15:18:40 +0100
 
 qtvideonode-plugin (0.1) UNRELEASED; urgency=low
 

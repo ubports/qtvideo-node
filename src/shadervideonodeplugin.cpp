@@ -45,6 +45,8 @@ public:
         return names;
     }
 
+    int m_tex_matrix;
+
 protected:
 
     virtual const char *vertexShader() const {
@@ -54,8 +56,9 @@ protected:
             "attribute highp vec4 qt_VertexPosition;            \n"
             "attribute highp vec2 qt_VertexTexCoord;            \n"
             "varying highp vec2 qt_TexCoord;                    \n"
+            "uniform mat4 s_tex_Matrix;                         \n"
             "void main() {                                      \n"
-            "    qt_TexCoord = qt_VertexTexCoord;               \n"
+            "    qt_TexCoord = (s_tex_Matrix * vec4(qt_VertexTexCoord, 0.0, 1.0)).xy;\n"
             "    gl_Position = qt_Matrix * qt_VertexPosition;   \n"
             "}";
         return shader;
@@ -63,14 +66,14 @@ protected:
 
     virtual const char *fragmentShader() const {
         static const char *shader =
-                "#extension GL_OES_EGL_image_external : require      \n"
-                "uniform samplerExternalOES sTexture;                \n"
-                "uniform lowp float opacity;                         \n"
-                "varying highp vec2 qt_TexCoord;                     \n"
-                "void main()                                         \n"
-                "{                                                   \n"
-                "  gl_FragColor = texture2D( sTexture, qt_TexCoord );\n"
-                "}                                                   \n";
+            "#extension GL_OES_EGL_image_external : require      \n"
+            "uniform samplerExternalOES sTexture;                \n"
+            "uniform lowp float opacity;                         \n"
+            "varying highp vec2 qt_TexCoord;                     \n"
+            "void main()                                         \n"
+            "{                                                   \n"
+            "  gl_FragColor = texture2D( sTexture, qt_TexCoord );\n"
+            "}                                                   \n";
         return shader;
     }
 
@@ -78,6 +81,7 @@ protected:
         m_id_matrix = program()->uniformLocation("qt_Matrix");
         m_id_Texture = program()->uniformLocation("sTexture");
         m_id_opacity = program()->uniformLocation("opacity");
+        m_tex_matrix = program()->uniformLocation("s_tex_Matrix");
     }
 
     int m_id_matrix;
@@ -91,12 +95,14 @@ class ShaderVideoMaterial : public QSGMaterial
 public:
     ShaderVideoMaterial(const QVideoSurfaceFormat &format)
         : m_format(format),
-          m_camControl(0)
+          m_camControl(0),
+          m_videoShader(0)
     {}
     ~ShaderVideoMaterial() {}
 
     QSGMaterialShader *createShader() const {
-        return new ShaderVideoShader(m_format.pixelFormat());
+        m_videoShader = new ShaderVideoShader(m_format.pixelFormat());
+        return m_videoShader;
     }
 
     virtual QSGMaterialType *type() const {
@@ -112,32 +118,43 @@ public:
 
     void bind()
     {
-//        QMutexLocker lock(&m_frameMutex);
         if (!m_camControl) {
             qWarning() << "No valid CameraControl";
             return;
         }
 
-//        if (!m_frame.availableMetaData().contains("CamControl")) {
-//            qDebug() << "No camera control included in video frame";
-//            return;
-//        }
-
         android_camera_update_preview_texture(m_camControl);
+
+        android_camera_get_preview_texture_transformation(m_camControl, m_textureMatrix);
+        flipMatrixY();
+        glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_FALSE, m_textureMatrix);
 
         glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }
 
-        android_camera_start_preview(m_camControl);
+    // As long as coordinates are 0..1, the y is flipped
+    void flipMatrixY()
+    {
+        // reduced way to multiplay the matrix with following matrix and assigin it back again
+        // 1  0  0  0
+        // 0 -1  0  1
+        // 0  0  1  0
+        // 0  0  0  1
+        m_textureMatrix[1] = -m_textureMatrix[1] + m_textureMatrix[3];
+        m_textureMatrix[5] = -m_textureMatrix[5] + m_textureMatrix[7];
+        m_textureMatrix[9] = -m_textureMatrix[9] + m_textureMatrix[11];
+        m_textureMatrix[13] = -m_textureMatrix[13] + m_textureMatrix[15];
     }
 
 private:
-//    QVideoFrame m_frame;
-//    QMutex m_frameMutex;
     QVideoSurfaceFormat m_format;
-    CameraControl* m_camControl;
+    CameraControl *m_camControl;
+    mutable ShaderVideoShader *m_videoShader;
+    GLfloat m_textureMatrix[16];
+    GLfloat m_flippedTextureMatrix[16];
 };
 
 
@@ -153,6 +170,10 @@ void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
 {
     QMutexLocker ml(&m_guard);
     if (! m_material->cameraControl()) {
+        if (!frame.availableMetaData().contains("CamControl")) {
+            qDebug() << "No camera control included in video frame";
+            return;
+        }
         int ci = frame.metaData("CamControl").toInt();
         m_material->setCamControl((CameraControl*)ci);
     }
@@ -194,6 +215,9 @@ void ShaderVideoShader::updateState(const RenderState &state,
     ShaderVideoMaterial *mat = dynamic_cast<ShaderVideoMaterial *>(newMaterial);
     program()->setUniformValue(m_id_Texture, 0);
 
+    if (state.isMatrixDirty())
+        program()->setUniformValue(m_id_matrix, state.combinedMatrix());
+
     mat->bind();
 
 //    if (state.isOpacityDirty()) {
@@ -201,7 +225,4 @@ void ShaderVideoShader::updateState(const RenderState &state,
 //        mat->updateBlending();
 //        program()->setUniformValue(m_id_opacity, GLfloat(mat->m_opacity));
 //    }
-
-    if (state.isMatrixDirty())
-        program()->setUniformValue(m_id_matrix, state.combinedMatrix());
 }
