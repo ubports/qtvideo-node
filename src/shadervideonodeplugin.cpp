@@ -18,169 +18,7 @@
  */
 
 #include "shadervideonodeplugin.h"
-
-#include "camera_compatibility_layer.h"
-
-#include <QDebug>
-#include <QMutex>
-#include <QtQuick/qsgmaterial.h>
-
-class ShaderVideoShader : public QSGMaterialShader
-{
-public:
-    ShaderVideoShader(QVideoFrame::PixelFormat pixelFormat)
-        : QSGMaterialShader(),
-          m_pixelFormat(pixelFormat)
-    {
-    }
-
-    void updateState(const RenderState &state, QSGMaterial *newMaterial, QSGMaterial *oldMaterial);
-
-    virtual char const *const *attributeNames() const {
-        static const char *names[] = {
-            "qt_VertexPosition",
-            "qt_VertexTexCoord",
-            0
-        };
-        return names;
-    }
-
-    int m_tex_matrix;
-
-protected:
-
-    virtual const char *vertexShader() const {
-        const char *shader =
-            "#extension GL_OES_EGL_image_external : require     \n"
-            "uniform highp mat4 qt_Matrix;                      \n"
-            "attribute highp vec4 qt_VertexPosition;            \n"
-            "attribute highp vec2 qt_VertexTexCoord;            \n"
-            "varying highp vec2 qt_TexCoord;                    \n"
-            "uniform mat4 s_tex_Matrix;                         \n"
-            "void main() {                                      \n"
-            "    qt_TexCoord = (s_tex_Matrix * vec4(qt_VertexTexCoord, 0.0, 1.0)).xy;\n"
-            "    gl_Position = qt_Matrix * qt_VertexPosition;   \n"
-            "}";
-        return shader;
-    }
-
-    virtual const char *fragmentShader() const {
-        static const char *shader =
-            "#extension GL_OES_EGL_image_external : require      \n"
-            "uniform samplerExternalOES sTexture;                \n"
-            "uniform lowp float opacity;                         \n"
-            "varying highp vec2 qt_TexCoord;                     \n"
-            "void main()                                         \n"
-            "{                                                   \n"
-            "  gl_FragColor = texture2D( sTexture, qt_TexCoord );\n"
-            "}                                                   \n";
-        return shader;
-    }
-
-    virtual void initialize() {
-        m_id_matrix = program()->uniformLocation("qt_Matrix");
-        m_id_Texture = program()->uniformLocation("sTexture");
-        m_id_opacity = program()->uniformLocation("opacity");
-        m_tex_matrix = program()->uniformLocation("s_tex_Matrix");
-    }
-
-    int m_id_matrix;
-    int m_id_Texture;
-    int m_id_opacity;
-    QVideoFrame::PixelFormat m_pixelFormat;
-};
-
-class ShaderVideoMaterial : public QSGMaterial
-{
-public:
-    ShaderVideoMaterial(const QVideoSurfaceFormat &format)
-        : m_format(format),
-          m_camControl(0),
-          m_videoShader(0)
-    {}
-    ~ShaderVideoMaterial() {}
-
-    QSGMaterialShader *createShader() const {
-        m_videoShader = new ShaderVideoShader(m_format.pixelFormat());
-        return m_videoShader;
-    }
-
-    virtual QSGMaterialType *type() const {
-        static QSGMaterialType theType;
-        return &theType;
-    }
-
-    void setCamControl(CameraControl *cc) {
-        m_camControl = cc;
-    }
-
-    CameraControl *cameraControl() const { return m_camControl; }
-
-    void bind()
-    {
-        if (!m_camControl) {
-            qWarning() << "No valid CameraControl";
-            return;
-        }
-
-        android_camera_update_preview_texture(m_camControl);
-
-        android_camera_get_preview_texture_transformation(m_camControl, m_textureMatrix);
-        flipMatrixY();
-        glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_FALSE, m_textureMatrix);
-
-        glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    }
-
-    // As long as coordinates are 0..1, the y is flipped
-    void flipMatrixY()
-    {
-        // reduced way to multiplay the matrix with following matrix and assigin it back again
-        // 1  0  0  0
-        // 0 -1  0  1
-        // 0  0  1  0
-        // 0  0  0  1
-        m_textureMatrix[1] = -m_textureMatrix[1] + m_textureMatrix[3];
-        m_textureMatrix[5] = -m_textureMatrix[5] + m_textureMatrix[7];
-        m_textureMatrix[9] = -m_textureMatrix[9] + m_textureMatrix[11];
-        m_textureMatrix[13] = -m_textureMatrix[13] + m_textureMatrix[15];
-    }
-
-private:
-    QVideoSurfaceFormat m_format;
-    CameraControl *m_camControl;
-    mutable ShaderVideoShader *m_videoShader;
-    GLfloat m_textureMatrix[16];
-    GLfloat m_flippedTextureMatrix[16];
-};
-
-
-
-ShaderVideoNode::ShaderVideoNode(const QVideoSurfaceFormat &format) :
-    m_format(format)
-{
-    m_material = new ShaderVideoMaterial(format);
-    setMaterial(m_material);
-}
-
-void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
-{
-    QMutexLocker ml(&m_guard);
-    if (! m_material->cameraControl()) {
-        if (!frame.availableMetaData().contains("CamControl")) {
-            qDebug() << "No camera control included in video frame";
-            return;
-        }
-        int ci = frame.metaData("CamControl").toInt();
-        m_material->setCamControl((CameraControl*)ci);
-    }
-    markDirty(DirtyMaterial);
-}
-
-
+#include "shadervideonode.h"
 
 QList<QVideoFrame::PixelFormat> ShaderVideoNodePlugin::supportedPixelFormats(
                                         QAbstractVideoBuffer::HandleType handleType) const
@@ -192,6 +30,7 @@ QList<QVideoFrame::PixelFormat> ShaderVideoNodePlugin::supportedPixelFormats(
         pixelFormats.append(QVideoFrame::Format_ARGB32);
         pixelFormats.append(QVideoFrame::Format_BGR32);
         pixelFormats.append(QVideoFrame::Format_BGRA32);
+        pixelFormats.append(QVideoFrame::Format_User); // handling a GL texture of the aal library for the camera
     }
 
     return pixelFormats;
@@ -203,26 +42,4 @@ QSGVideoNode *ShaderVideoNodePlugin::createNode(const QVideoSurfaceFormat &forma
         return new ShaderVideoNode(format);
 
     return 0;
-}
-
-
-
-void ShaderVideoShader::updateState(const RenderState &state,
-                                                QSGMaterial *newMaterial,
-                                                QSGMaterial *oldMaterial)
-{
-    Q_UNUSED(oldMaterial);
-    ShaderVideoMaterial *mat = dynamic_cast<ShaderVideoMaterial *>(newMaterial);
-    program()->setUniformValue(m_id_Texture, 0);
-
-    if (state.isMatrixDirty())
-        program()->setUniformValue(m_id_matrix, state.combinedMatrix());
-
-    mat->bind();
-
-//    if (state.isOpacityDirty()) {
-//        mat->m_opacity = state.opacity();
-//        mat->updateBlending();
-//        program()->setUniformValue(m_id_opacity, GLfloat(mat->m_opacity));
-//    }
 }

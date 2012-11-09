@@ -1,3 +1,10 @@
+qtvideonode-plugin (0.1.3) UNRELEASED; urgency=low
+
+  * Spliting up code in separate files
+  * Add a unit test
+
+ -- Guenter Schwann <guenter.schwann@canonical.com>  Fri, 09 Nov 2012 10:42:06 +0100
+
 qtvideonode-plugin (0.1.2) quantal; urgency=low
 
   * new release 

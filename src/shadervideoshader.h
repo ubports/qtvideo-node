@@ -17,21 +17,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SHADERVIDEONODEPLUGIN_H
-#define SHADERVIDEONODEPLUGIN_H
+#ifndef SHADERVIDEOSHADER_H
+#define SHADERVIDEOSHADER_H
 
-#include <private/qsgvideonode_p.h>
-#include <QVideoSurfaceFormat>
+#include <QSGMaterialShader>
+#include <QVideoFrame>
 
-class ShaderVideoNodePlugin : public QObject, public QSGVideoNodeFactoryInterface
+class ShaderVideoShader : public QSGMaterialShader
 {
-    Q_OBJECT
-    Q_INTERFACES(QSGVideoNodeFactoryInterface)
-    Q_PLUGIN_METADATA(IID "org.qt-project.qt.sgvideonodefactory/5.0" FILE "shadervideonode.json")
-
 public:
-    QList<QVideoFrame::PixelFormat> supportedPixelFormats(QAbstractVideoBuffer::HandleType handleType) const;
-    QSGVideoNode *createNode(const QVideoSurfaceFormat &format);
+    ShaderVideoShader(QVideoFrame::PixelFormat pixelFormat);
+
+    void updateState(const RenderState &state, QSGMaterial *newMaterial, QSGMaterial *oldMaterial);
+
+    char const *const *attributeNames() const;
+
+    int m_tex_matrix;
+
+protected:
+    const char *vertexShader() const;
+    const char *fragmentShader() const;
+
+    void initialize();
+
+    int m_id_matrix;
+    int m_id_Texture;
+    int m_id_opacity;
+    QVideoFrame::PixelFormat m_pixelFormat;
 };
 
-#endif // SHADERVIDEONODEPLUGIN_H
+#endif // SHADERVIDEOSHADER_H

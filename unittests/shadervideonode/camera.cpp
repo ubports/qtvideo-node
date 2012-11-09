@@ -17,21 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SHADERVIDEONODEPLUGIN_H
-#define SHADERVIDEONODEPLUGIN_H
+#include "camera_compatibility_layer.h"
 
-#include <private/qsgvideonode_p.h>
-#include <QVideoSurfaceFormat>
-
-class ShaderVideoNodePlugin : public QObject, public QSGVideoNodeFactoryInterface
+void android_camera_update_preview_texture(CameraControl *)
 {
-    Q_OBJECT
-    Q_INTERFACES(QSGVideoNodeFactoryInterface)
-    Q_PLUGIN_METADATA(IID "org.qt-project.qt.sgvideonodefactory/5.0" FILE "shadervideonode.json")
+}
 
-public:
-    QList<QVideoFrame::PixelFormat> supportedPixelFormats(QAbstractVideoBuffer::HandleType handleType) const;
-    QSGVideoNode *createNode(const QVideoSurfaceFormat &format);
-};
-
-#endif // SHADERVIDEONODEPLUGIN_H
+void android_camera_get_preview_texture_transformation(CameraControl *, GLfloat *)
+{
+}
