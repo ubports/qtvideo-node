@@ -1,6 +1,8 @@
 CONFIG += testcase
 TARGET = tst_shadervideonode
 
+include(../../coverage.pri)
+
 QT += testlib multimedia-private qtmultimediaquicktools-private opengl
 
 SOURCES += tst_shadervideonode.cpp \
