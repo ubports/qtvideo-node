@@ -1,5 +1,5 @@
 TARGET = shadervideonode
-QT += quick opengl multimedia-private qtmultimediaquicktools-private
+QT += multimedia-private qtmultimediaquicktools-private opengl
 
 PLUGIN_TYPE = video/videonode
 
@@ -13,7 +13,13 @@ LIBS += -L/usr/lib/arm-linux-gnueabi -lcamera
 OTHER_FILES += shadervideonode.json
 
 HEADERS += \
-    shadervideonodeplugin.h
+    shadervideonodeplugin.h \
+    shadervideomaterial.h \
+    shadervideoshader.h \
+    shadervideonode.h
 
 SOURCES += \
-    shadervideonodeplugin.cpp
+    shadervideonodeplugin.cpp \
+    shadervideomaterial.cpp \
+    shadervideoshader.cpp \
+    shadervideonode.cpp
