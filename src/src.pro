@@ -1,6 +1,8 @@
 TARGET = shadervideonode
 QT += multimedia-private qtmultimediaquicktools-private opengl
 
+include(../coverage.pri)
+
 PLUGIN_TYPE = video/videonode
 
 load(qt_plugin)
