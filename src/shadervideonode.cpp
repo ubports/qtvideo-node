@@ -36,13 +36,14 @@ QVideoFrame::PixelFormat ShaderVideoNode::pixelFormat() const
 
 void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
 {
-    if (! m_material->cameraControl()) {
-        if (!frame.availableMetaData().contains("CamControl")) {
-            qDebug() << "No camera control included in video frame";
-            return;
-        }
-        int ci = frame.metaData("CamControl").toInt();
-        m_material->setCamControl((CameraControl*)ci);
+    if (!frame.availableMetaData().contains("CamControl")) {
+        qDebug() << "No camera control included in video frame";
+        return;
     }
-    markDirty(DirtyMaterial);
+
+    int ci = frame.metaData("CamControl").toInt();
+    m_material->setCamControl((CameraControl*)ci);
+
+    if (ci > 0)
+        markDirty(DirtyMaterial);
 }
