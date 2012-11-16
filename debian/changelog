@@ -1,3 +1,10 @@
+qtvideonode-plugin (0.1.4) UNRELEASED; urgency=low
+
+  * Use static shader object, as Qt caches the pointer to it
+  * Using QAbstractVideoSurface::stop() obsoletes the check for the CameraControl pointer on every frame
+
+ -- Guenter Schwann <guenter.schwann@canonical.com>  Fri, 15 Nov 2012 10:12:06 +0100
+
 qtvideonode-plugin (0.1.3) quantal; urgency=low
 
   [ Guenter Schwann ]

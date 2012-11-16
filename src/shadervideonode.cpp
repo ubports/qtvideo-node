@@ -36,21 +36,19 @@ QVideoFrame::PixelFormat ShaderVideoNode::pixelFormat() const
 
 void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
 {
-    /* The AAL+ CameraControl pointer is updated with every frame
-     * Reason is, that the pointer might change. For example when switching the camera.
-     * As the camera-backend does not know anything about this video node and vice versa,
-     * it's impossible request that check/set when a new CameraControl becomes active.
-     *
-     * But the overhead of setting the pointer is very minor.
-     */
-    if (!frame.availableMetaData().contains("CamControl")) {
-        qDebug() << "No camera control included in video frame";
-        return;
+    if (!m_material->cameraControl()) {
+        if (!frame.availableMetaData().contains("CamControl")) {
+            qWarning() << "No camera control included in video frame";
+            return;
+        }
+
+        int ci = frame.metaData("CamControl").toInt();
+        if (ci == 0) {
+            qWarning() << "No valid camera control pointer in video frame";
+            return;
+        }
+        m_material->setCamControl((CameraControl*)ci);
     }
 
-    int ci = frame.metaData("CamControl").toInt();
-    m_material->setCamControl((CameraControl*)ci);
-
-    if (ci > 0)
-        markDirty(DirtyMaterial);
+    markDirty(DirtyMaterial);
 }

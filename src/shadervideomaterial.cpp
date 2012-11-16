@@ -22,16 +22,19 @@
 
 #include <camera_compatibility_layer.h>
 
+ShaderVideoShader *ShaderVideoMaterial::m_videoShader = 0;
+
 ShaderVideoMaterial::ShaderVideoMaterial(const QVideoSurfaceFormat &format)
     : m_format(format),
-    m_camControl(0),
-    m_videoShader(0)
+    m_camControl(0)
 {
 }
 
 QSGMaterialShader *ShaderVideoMaterial::createShader() const
 {
-    m_videoShader = new ShaderVideoShader(m_format.pixelFormat());
+    if (!m_videoShader) {
+        m_videoShader = new ShaderVideoShader(m_format.pixelFormat());
+    }
     return m_videoShader;
 }
 
