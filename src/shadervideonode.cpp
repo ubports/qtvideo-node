@@ -21,6 +21,7 @@
 #include "shadervideomaterial.h"
 
 #include <camera_compatibility_layer.h>
+#include <media_compatibility_layer.h>
 
 ShaderVideoNode::ShaderVideoNode(const QVideoSurfaceFormat &format) :
     m_format(format)
@@ -43,13 +44,22 @@ void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
      *
      * But the overhead of setting the pointer is very minor.
      */
-    if (!frame.availableMetaData().contains("CamControl")) {
-        qDebug() << "No camera control included in video frame";
+    if (!frame.availableMetaData().contains("CamControl") && !frame.availableMetaData().contains("MediaPlayerControl")) {
+        qDebug() << "No camera control or media player control instance included in video frame";
         return;
     }
 
-    int ci = frame.metaData("CamControl").toInt();
-    m_material->setCamControl((CameraControl*)ci);
+    int ci = 0;
+    if (frame.availableMetaData().contains("CamControl"))
+    {
+        ci = frame.metaData("CamControl").toInt();
+        m_material->setCamControl((CameraControl*)ci);
+    }
+    else if (frame.availableMetaData().contains("MediaPlayerControl"))
+    {
+        ci = frame.metaData("MediaPlayerControl").toInt();
+        m_material->setMediaPlayerControl((MediaPlayerWrapper*)ci);
+    }
 
     if (ci > 0)
         markDirty(DirtyMaterial);
