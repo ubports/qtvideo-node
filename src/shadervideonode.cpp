@@ -52,11 +52,13 @@ void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
     int ci = 0;
     if (frame.availableMetaData().contains("CamControl"))
     {
+        // qDebug() << "Using CamControl metadata from frame." << endl;
         ci = frame.metaData("CamControl").toInt();
         m_material->setCamControl((CameraControl*)ci);
     }
     else if (frame.availableMetaData().contains("MediaPlayerControl"))
     {
+        // qDebug() << "Using MediaPlayerControl metadata from frame." << endl;
         ci = frame.metaData("MediaPlayerControl").toInt();
         m_material->setMediaPlayerControl((MediaPlayerWrapper*)ci);
     }
