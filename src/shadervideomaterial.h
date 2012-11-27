@@ -51,7 +51,7 @@ private:
     QVideoSurfaceFormat m_format;
     CameraControl *m_camControl;
     MediaPlayerWrapper *m_mediaPlayerControl;
-    mutable ShaderVideoShader *m_videoShader;
+    static ShaderVideoShader *m_videoShader; // the shader is cached in the Qt scene graph
     GLfloat m_textureMatrix[16];
     GLfloat m_flippedTextureMatrix[16];
 };
