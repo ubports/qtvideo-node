@@ -21,12 +21,14 @@
 #include "shadervideoshader.h"
 
 #include <camera_compatibility_layer.h>
+#include <media_compatibility_layer.h>
 
 ShaderVideoShader *ShaderVideoMaterial::m_videoShader = 0;
 
 ShaderVideoMaterial::ShaderVideoMaterial(const QVideoSurfaceFormat &format)
     : m_format(format),
-    m_camControl(0)
+    m_camControl(0),
+    m_mediaPlayerControl(NULL)
 {
 }
 
@@ -54,16 +56,33 @@ CameraControl *ShaderVideoMaterial::cameraControl() const
     return m_camControl;
 }
 
+void ShaderVideoMaterial::setMediaPlayerControl(MediaPlayerWrapper *mp)
+{
+    m_mediaPlayerControl = mp;
+}
+
+MediaPlayerWrapper *ShaderVideoMaterial::mediaplayerControl() const
+{
+    return m_mediaPlayerControl;
+}
+
 void ShaderVideoMaterial::bind()
 {
-    if (!m_camControl) {
-        qWarning() << "No valid CameraControl";
+    if (!m_camControl && !m_mediaPlayerControl) {
+        qWarning() << "No valid CameraControl or MediaPlayerWrapper instance.";
         return;
     }
 
-    android_camera_update_preview_texture(m_camControl);
-
-    android_camera_get_preview_texture_transformation(m_camControl, m_textureMatrix);
+    if (m_camControl != NULL)
+    {
+        android_camera_update_preview_texture(m_camControl);
+        android_camera_get_preview_texture_transformation(m_camControl, m_textureMatrix);
+    }
+    else if (m_mediaPlayerControl != NULL)
+    {
+        android_media_update_surface_texture(m_mediaPlayerControl);
+        android_media_surface_texture_get_transformation_matrix(m_mediaPlayerControl, m_textureMatrix);
+    }
     flipMatrixY();
     glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_FALSE, m_textureMatrix);
 
@@ -76,7 +95,7 @@ void ShaderVideoMaterial::bind()
 // As long as coordinates are 0..1, the y is flipped
 void ShaderVideoMaterial::flipMatrixY()
 {
-    // reduced way to multiplay the matrix with following matrix and assigin it back again
+    // reduced way to multiply the matrix with following matrix and assign it back again
     // 1  0  0  0
     // 0 -1  0  1
     // 0  0  1  0

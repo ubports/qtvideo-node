@@ -1,3 +1,16 @@
+qtvideonode-plugin (0.1.5) quantal; urgency=low
+
+  [ Jim Hodapp ]
+  * Added media player texture support.
+  * Added copy of media compat layer for the unit tests.
+  * Removed two frequent debug statements.
+
+  [ Ricardo Mendoza ]
+  * Various build paths and packaging updates
+  * Update mediaplayerControl() on frame data
+
+ -- Ricardo Mendoza <ricardo.mendoza@canonical.com>  Mon, 26 Nov 2012 23:29:32 -0430
+
 qtvideonode-plugin (0.1.4) quantal; urgency=low
 
   [ Guenter Schwann ]
