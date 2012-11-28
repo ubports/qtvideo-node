@@ -25,6 +25,7 @@
 #include <qgl.h>
 
 struct CameraControl;
+struct MediaPlayerWrapper;
 class ShaderVideoShader;
 
 class ShaderVideoMaterial : public QSGMaterial
@@ -39,6 +40,9 @@ public:
     void setCamControl(CameraControl *cc);
     CameraControl *cameraControl() const;
 
+    void setMediaPlayerControl(MediaPlayerWrapper *mp);
+    MediaPlayerWrapper *mediaplayerControl() const;
+
     void bind();
 
     void flipMatrixY();
@@ -46,6 +50,7 @@ public:
 private:
     QVideoSurfaceFormat m_format;
     CameraControl *m_camControl;
+    MediaPlayerWrapper *m_mediaPlayerControl;
     static ShaderVideoShader *m_videoShader; // the shader is cached in the Qt scene graph
     GLfloat m_textureMatrix[16];
     GLfloat m_flippedTextureMatrix[16];

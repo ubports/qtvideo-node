@@ -21,6 +21,7 @@
 #include "shadervideomaterial.h"
 
 #include <camera_compatibility_layer.h>
+#include <media_compatibility_layer.h>
 
 ShaderVideoNode::ShaderVideoNode(const QVideoSurfaceFormat &format) :
     m_format(format)
@@ -36,18 +37,28 @@ QVideoFrame::PixelFormat ShaderVideoNode::pixelFormat() const
 
 void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
 {
-    if (!m_material->cameraControl()) {
-        if (!frame.availableMetaData().contains("CamControl")) {
-            qWarning() << "No camera control included in video frame";
+    if (!m_material->cameraControl() && !m_material->mediaplayerControl()) {
+        if (!frame.availableMetaData().contains("CamControl") && !frame.availableMetaData().contains("MediaPlayerControl")) {
+            qWarning() << "No camera control or media player control instance included in video frame";
             return;
         }
 
-        int ci = frame.metaData("CamControl").toInt();
-        if (ci == 0) {
-            qWarning() << "No valid camera control pointer in video frame";
-            return;
+        int ci = 0;
+        if (frame.availableMetaData().contains("CamControl")) {
+            ci = frame.metaData("CamControl").toInt();
+            if (ci == 0) {
+                qWarning() << "No valid camera control pointer in video frame";
+                return;
+            }
+            m_material->setCamControl((CameraControl*)ci);
+        } else if (frame.availableMetaData().contains("MediaPlayerControl")) {
+            ci = frame.metaData("MediaPlayerControl").toInt();
+            if (ci == 0) {
+                qWarning() << "No valid media player control pointer in video frame";
+                return;
+            }
+           m_material->setMediaPlayerControl((MediaPlayerWrapper*)ci);
         }
-        m_material->setCamControl((CameraControl*)ci);
     }
 
     markDirty(DirtyMaterial);
