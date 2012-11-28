@@ -26,6 +26,7 @@
 #include <shadervideomaterial.h>
 
 #include "camera_compatibility_layer.h"
+#include "media_compatibility_layer.h"
 
 #define private public
 #include "shadervideonode.h"
@@ -34,10 +35,11 @@ class tst_ShaderVideoNode : public QObject
 {
     Q_OBJECT
 private slots:
-    void testSetCurrentFrame();
+    void testCameraSetCurrentFrame();
+    void testMediaPlayerSetCurrentFrame();
 };
 
-void tst_ShaderVideoNode::testSetCurrentFrame()
+void tst_ShaderVideoNode::testCameraSetCurrentFrame()
 {
     QVideoSurfaceFormat format;
     ShaderVideoNode node(format);
@@ -52,6 +54,23 @@ void tst_ShaderVideoNode::testSetCurrentFrame()
     frame.setMetaData("CamControl", (int)cc);
     node.setCurrentFrame(frame);
     QCOMPARE((int)node.m_material->cameraControl(), (int)cc);
+}
+
+void tst_ShaderVideoNode::testMediaPlayerSetCurrentFrame()
+{
+    QVideoSurfaceFormat format;
+    ShaderVideoNode node(format);
+
+    MediaPlayerWrapper *mp = android_media_new_player();
+    QImage img(1920, 800, QImage::Format_ARGB32);
+    QVideoFrame frame(img);
+
+    node.setCurrentFrame(frame);
+    QCOMPARE((int)node.m_material->mediaplayerControl(), 0);
+
+    frame.setMetaData("MediaPlayerControl", (int)mp);
+    node.setCurrentFrame(frame);
+    QCOMPARE((int)node.m_material->mediaplayerControl(), (int)mp);
 }
 
 QTEST_MAIN(tst_ShaderVideoNode)
