@@ -19,7 +19,7 @@
 #ifndef MEDIA_COMPATIBILITY_LAYER_H_
 #define MEDIA_COMPATIBILITY_LAYER_H_
 
-#include <GLES2/gl2.h>
+#include <qgl.h>
 
 #include <stdint.h>
 #include <unistd.h>

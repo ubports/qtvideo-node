@@ -1,4 +1,5 @@
 CONFIG += testcase
+CONFIG += no_private_qt_headers_warning
 TARGET = tst_shadervideonode
 
 include(../../coverage.pri)
