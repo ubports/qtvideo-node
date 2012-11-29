@@ -11,9 +11,9 @@ SOURCES += tst_shadervideonode.cpp \
     ../../src/shadervideonode.cpp \
     ../../src/shadervideoshader.cpp \
     camera.cpp \
-    media.cpp
+    player.cpp
 
 HEADERS += camera_compatibility_layer.h \
-    media_compatibility_layer.h
+           media_compatibility_layer.h
 
 INCLUDEPATH += ../../src

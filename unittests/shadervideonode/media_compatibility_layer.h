@@ -30,6 +30,7 @@ extern "C" {
 
     typedef void (*on_msg_set_video_size)(int height, int width, void *context);
     typedef void (*on_video_texture_needs_update)(void *context);
+    typedef void (*on_msg_error)(void *context);
 
     struct MediaPlayerWrapper;
 
@@ -37,6 +38,7 @@ extern "C" {
 
     void android_media_set_video_size_cb(MediaPlayerWrapper *mp, on_msg_set_video_size cb, void *context);
     void android_media_set_video_texture_needs_update_cb(MediaPlayerWrapper *mp, on_video_texture_needs_update cb, void *context);
+    void android_media_set_error_cb(MediaPlayerWrapper *mp, on_msg_error cb, void *context);
 
     MediaPlayerWrapper *android_media_new_player();
     int android_media_set_data_source(MediaPlayerWrapper *mp, const char* url);
@@ -51,6 +53,9 @@ extern "C" {
     int android_media_seek_to(MediaPlayerWrapper *mp, int msec);
     int android_media_get_current_position(MediaPlayerWrapper *mp, int *msec);
     int android_media_get_duration(MediaPlayerWrapper *mp, int *msec);
+
+    int android_media_get_volume(MediaPlayerWrapper *mp, int *volume);
+    int android_media_set_volume(MediaPlayerWrapper *mp, int volume);
 
 #ifdef __cplusplus
 }
