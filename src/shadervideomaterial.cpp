@@ -83,7 +83,7 @@ void ShaderVideoMaterial::bind()
         android_media_update_surface_texture(m_mediaPlayerControl);
         android_media_surface_texture_get_transformation_matrix(m_mediaPlayerControl, m_textureMatrix);
     }
-    flipMatrixY();
+    undoAndroidYFlip(m_textureMatrix);
     glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_FALSE, m_textureMatrix);
 
     glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -92,16 +92,21 @@ void ShaderVideoMaterial::bind()
     glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 }
 
-// As long as coordinates are 0..1, the y is flipped
-void ShaderVideoMaterial::flipMatrixY()
+void ShaderVideoMaterial::undoAndroidYFlip(GLfloat matrix[])
 {
-    // reduced way to multiply the matrix with following matrix and assign it back again
-    // 1  0  0  0
-    // 0 -1  0  1
-    // 0  0  1  0
-    // 0  0  0  1
-    m_textureMatrix[1] = -m_textureMatrix[1] + m_textureMatrix[3];
-    m_textureMatrix[5] = -m_textureMatrix[5] + m_textureMatrix[7];
-    m_textureMatrix[9] = -m_textureMatrix[9] + m_textureMatrix[11];
-    m_textureMatrix[13] = -m_textureMatrix[13] + m_textureMatrix[15];
+    // The android matrix flips the y coordinate
+    // The android matrix has it's texture coordinates not from 0..1 but in between there
+    // The higher value is stored in m[13], the lower one is the higher one minus the height
+    GLfloat height = -matrix[5]; // invert because of the flipping
+    GLfloat offset = matrix[13] - height;
+    matrix[5] = height;
+    matrix[13] = offset;
+}
+
+void ShaderVideoMaterial::printTextureMaxtrix(GLfloat matrix[])
+{
+    qDebug() << matrix[0] << matrix[4] << matrix[8] << matrix[12];
+    qDebug() << matrix[1] << matrix[5] << matrix[9] << matrix[13];
+    qDebug() << matrix[2] << matrix[6] << matrix[10] << matrix[14];
+    qDebug() << matrix[3] << matrix[7] << matrix[11] << matrix[15];
 }
