@@ -45,15 +45,16 @@ public:
 
     void bind();
 
-    void flipMatrixY();
 
 private:
+    void undoAndroidYFlip(GLfloat matrix[]);
+    void printGLMaxtrix(GLfloat matrix[]);
+
     QVideoSurfaceFormat m_format;
     CameraControl *m_camControl;
     MediaPlayerWrapper *m_mediaPlayerControl;
     static ShaderVideoShader *m_videoShader; // the shader is cached in the Qt scene graph
     GLfloat m_textureMatrix[16];
-    GLfloat m_flippedTextureMatrix[16];
 };
 
 #endif // SHADERVIDEOMATERIAL_H
