@@ -103,7 +103,14 @@ void ShaderVideoMaterial::undoAndroidYFlip(GLfloat matrix[])
     matrix[13] = offset;
 }
 
-void ShaderVideoMaterial::printTextureMaxtrix(GLfloat matrix[])
+/*!
+ * \brief ShaderVideoMaterial::printGLMaxtrix
+ * Prints a OpenGL matrix (GLfloat m[16]) to std out.
+ * This function stays here for convenience in case some more debugging is necessary for the android
+ * transformation matrix.
+ * \param matrix Matrix to be printed to std out
+ */
+void ShaderVideoMaterial::printGLMaxtrix(GLfloat matrix[])
 {
     qDebug() << matrix[0] << matrix[4] << matrix[8] << matrix[12];
     qDebug() << matrix[1] << matrix[5] << matrix[9] << matrix[13];

@@ -48,7 +48,7 @@ public:
 
 private:
     void undoAndroidYFlip(GLfloat matrix[]);
-    void printTextureMaxtrix(GLfloat matrix[]);
+    void printGLMaxtrix(GLfloat matrix[]);
 
     QVideoSurfaceFormat m_format;
     CameraControl *m_camControl;
