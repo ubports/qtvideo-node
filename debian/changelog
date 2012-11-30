@@ -1,3 +1,9 @@
+qtvideonode-plugin (0.1.6) quantal; urgency=low
+
+  * Fixed video playback artifact box. 
+
+ -- Jim Hodapp <jhodapp@trinity>  Fri, 30 Nov 2012 12:18:49 -0500
+
 qtvideonode-plugin (0.1.5) quantal; urgency=low
 
   [ Jim Hodapp ]
