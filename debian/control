@@ -13,6 +13,7 @@ Build-Depends: debhelper (>= 8.0.0),
                qtdeclarative5-dev,
                qtmultimedia5-private-dev,
                qtdeclarative5-private-dev,
+               libqt5opengl5-dev,
                pkg-config
 Standards-Version: 3.9.3
 Vcs-Bzr: https://code.launchpad.net/~amanzi-team/barrydale/cameraplugin-aal

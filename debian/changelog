@@ -1,3 +1,9 @@
+qtvideonode-plugin (0.1.11) quantal; urgency=low
+
+  * Fixes for Qt5 final release packages
+
+ -- Guenter Schwann <guenter.schwann@canonical.com>  Tue, 22 Jan 2013 21:43:25 +0100
+
 qtvideonode-plugin (0.1.10) quantal; urgency=low
 
   * Fixes for Qt5 final release packages
