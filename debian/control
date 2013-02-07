@@ -1,8 +1,8 @@
 Source: qtvideonode-plugin
 Section: libs
 Priority: optional
-Maintainer: The Amazni team <phablet@lists.canonical.com>
-XSBC-Original-Maintainer: Guenter Schwann <guenter.schwann@canonical.com>
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: The Amazni team <phablet@lists.canonical.com>
 Build-Depends: debhelper (>= 8.0.0),
                libgl-dev,
                libgles2-mesa-dev,
@@ -16,7 +16,8 @@ Build-Depends: debhelper (>= 8.0.0),
                libqt5opengl5-dev,
                pkg-config
 Standards-Version: 3.9.3
-Vcs-Bzr: https://code.launchpad.net/~amanzi-team/barrydale/cameraplugin-aal
+Vcs-Bzr: lp:~amanzi-team/barrydale/qtvideonode-plugin/
+Vcs-Browser: https://bazaar.launchpad.net/~amanzi-team/barrydale/qtvideonode-plugin/files
 
 Package: qtvideonode-plugin
 Architecture: armel armhf

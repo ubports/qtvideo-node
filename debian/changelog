@@ -1,3 +1,10 @@
+qtvideonode-plugin (0.1.12) quantal; urgency=low
+
+  * debian/control: updating metadata to reflect the right vcs and package
+    maintainer
+
+ -- Ricardo Salveti de Araujo <ricardo.salveti@canonical.com>  Wed, 06 Feb 2013 21:51:28 -0200
+
 qtvideonode-plugin (0.1.11) quantal; urgency=low
 
   * Fixes for Qt5 final release packages
