@@ -23,4 +23,5 @@ Architecture: armel armhf
 Depends: ${shlibs:Depends},
          ${misc:Depends}
 Description: Plugin for showing camera viewfinder in Qt
-  Plugin for showing camera viewfinder in Qt
+  Plugin for showing camera viewfinder in Qt as well as the video surface in the
+  media-player
