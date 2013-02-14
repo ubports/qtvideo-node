@@ -1,3 +1,9 @@
+qtvideonode-plugin (0.1.13) quantal; urgency=low
+
+  * License change to LGPLv3
+
+ -- Guenter Schwann <guenter.schwann@canonical.com>  Thu, 14 Feb 2013 20:25:25 +0100
+
 qtvideonode-plugin (0.1.12) quantal; urgency=low
 
   * debian/control: updating metadata to reflect the right vcs and package
