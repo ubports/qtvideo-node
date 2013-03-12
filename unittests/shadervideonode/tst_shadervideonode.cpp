@@ -73,3 +73,4 @@ void tst_ShaderVideoNode::testMediaPlayerSetCurrentFrame()
 QTEST_MAIN(tst_ShaderVideoNode)
 
 #include "tst_shadervideonode.moc"
+#include "moc_shadervideonode.cpp"

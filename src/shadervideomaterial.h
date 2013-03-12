@@ -42,7 +42,6 @@ public:
 
     void bind();
 
-
 private:
     void undoAndroidYFlip(GLfloat matrix[]);
     void printGLMaxtrix(GLfloat matrix[]);
