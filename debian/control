@@ -13,7 +13,7 @@ Build-Depends: debhelper (>= 8.0.0),
                qtmultimedia5-private-dev,
                qtdeclarative5-private-dev,
                libqt5opengl5-dev,
-               libqtubuntu-media-signals-dev
+               libqtubuntu-media-signals-dev,
                pkg-config
 Standards-Version: 3.9.3
 Vcs-Bzr: lp:qtubuntu-camera/qtvideonode
