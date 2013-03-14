@@ -20,7 +20,7 @@ Vcs-Bzr: lp:qtubuntu-camera/qtvideonode
 Vcs-Browser: https://code.launchpad.net/qtubuntu-camera/qtvideonode
 
 Package: qtvideonode-plugin
-Architecture: any
+Architecture: armel armhf
 Depends: ${shlibs:Depends},
          ${misc:Depends}
 Description: Plugin for showing camera viewfinder in Qt
