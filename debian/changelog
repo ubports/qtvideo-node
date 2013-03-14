@@ -1,3 +1,11 @@
+qtvideonode-plugin (0.2.0) quantal; urgency=low
+
+  * Releasing new version with multithreaded rendering support enabled.
+  * Enable Qt multithreaded rendering to work for both the media player and
+    camera apps.
+
+ -- Jim Hodapp <jim.hodapp@canonical.com>  Thu, 14 Mar 2013 12:55:12 -0400
+
 qtvideonode-plugin (0.1.13) quantal; urgency=low
 
   * License change to LGPLv3
