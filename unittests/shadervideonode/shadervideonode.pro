@@ -6,6 +6,11 @@ include(../../coverage.pri)
 
 QT += testlib multimedia-private qtmultimediaquicktools-private opengl
 
+# This is to avoid a segfault in shadervideonode.cpp when it tries to call
+# glGenTextures(), since the platform currently does not support real OpenGL
+# when running unit tests.
+DEFINES += TST_NO_OPENGL
+
 SOURCES += tst_shadervideonode.cpp \
     ../../src/shadervideomaterial.cpp \
     ../../src/shadervideonode.cpp \

@@ -95,7 +95,14 @@ void ShaderVideoNode::onTakeSnapshot(const CameraControl *control)
 
 void ShaderVideoNode::getGLTextureID()
 {
+// This is to avoid a segfault in shadervideonode.cpp when it tries to call
+// glGenTextures(), since the platform currently does not support real OpenGL
+// when running unit tests.
+#ifndef TST_NO_OPENGL
     glGenTextures(1, &m_textureId);
+#else
+    m_textureId = 700001;
+#endif
     if (m_textureId == 0) {
         qWarning() << "Unable to get texture ID";
         return;
