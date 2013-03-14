@@ -70,13 +70,11 @@ void ShaderVideoMaterial::bind()
         return;
     }
 
-    if (m_camControl != NULL)
-    {
+    if (m_camControl != NULL) {
         android_camera_update_preview_texture(m_camControl);
         android_camera_get_preview_texture_transformation(m_camControl, m_textureMatrix);
     }
-    else if (m_mediaPlayerControl != NULL)
-    {
+    else if (m_mediaPlayerControl != NULL) {
         android_media_update_surface_texture(m_mediaPlayerControl);
         android_media_surface_texture_get_transformation_matrix(m_mediaPlayerControl, m_textureMatrix);
     }
