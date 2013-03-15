@@ -1,3 +1,9 @@
+qtvideonode-plugin (0.2.1) UNRELEASED; urgency=low
+
+  * Fixing up some minor packaging issues.
+
+ -- Robert Bruce Park <robert.park@canonical.com>  Thu, 14 Mar 2013 17:43:20 -0700
+
 qtvideonode-plugin (0.2.0) quantal; urgency=low
 
   * Releasing new version with multithreaded rendering support enabled.
@@ -51,7 +57,7 @@ qtvideonode-plugin (0.1.7) quantal; urgency=low
 
 qtvideonode-plugin (0.1.6) quantal; urgency=low
 
-  * Fixed video playback artifact box. 
+  * Fixed video playback artifact box.
 
  -- Jim Hodapp <jhodapp@trinity>  Fri, 30 Nov 2012 12:18:49 -0500
 
@@ -87,7 +93,7 @@ qtvideonode-plugin (0.1.3) quantal; urgency=low
 
 qtvideonode-plugin (0.1.2) quantal; urgency=low
 
-  * new release 
+  * new release
 
  -- Bill Filler <bill.filler@canonical.com>  Mon, 05 Nov 2012 15:45:32 -0500
 
@@ -103,4 +109,3 @@ qtvideonode-plugin (0.1) UNRELEASED; urgency=low
   * Initial release.
 
  -- Guenter Schwann <guenter.schwann@canonical.com>  Wed, 24 Oct 2012 17:12:25 +0100
-
