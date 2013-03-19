@@ -56,7 +56,6 @@ char const *const *ShaderVideoShader::attributeNames() const
 const char *ShaderVideoShader::vertexShader() const
 {
     const char *shader =
-        "#extension GL_OES_EGL_image_external : require     \n"
         "uniform highp mat4 qt_Matrix;                      \n"
         "attribute highp vec4 qt_VertexPosition;            \n"
         "attribute highp vec2 qt_VertexTexCoord;            \n"
