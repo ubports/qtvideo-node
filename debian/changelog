@@ -4,6 +4,14 @@ qtvideonode-plugin (0.2.1-0ubuntu1) UNRELEASED; urgency=low
 
  -- Robert Bruce Park <robert.park@canonical.com>  Thu, 14 Mar 2013 17:43:20 -0700
 
+qtvideonode-plugin (0.2.1) quantal; urgency=low
+
+  * Fix video playback so that it works on the Nexus 7 device. Audio still
+    does not work. The GL_OES_EGL_image_external OpenGL extension should never
+    have been included in the first place for the shader.
+
+ -- Jim Hodapp <jim.hodapp@canonical.com>  Tue, 19 Mar 2013 13:07:30 -0400
+
 qtvideonode-plugin (0.2.0) quantal; urgency=low
 
   * Releasing new version with multithreaded rendering support enabled.
