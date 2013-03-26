@@ -15,7 +15,7 @@ Build-Depends: debhelper (>= 9),
                qtdeclarative5-private-dev,
                qtmultimedia5-dev,
                qtmultimedia5-private-dev,
-Standards-Version: 3.9.3
+Standards-Version: 3.9.4
 Homepage: https://launchpad.net/qtvideo-node
 # If you aren't a member of ~phablet-team but need to upload packaging changes,
 # just go ahead.  ~phablet-team will notice and sync up the code again.
@@ -23,7 +23,8 @@ Vcs-Bzr: https://code.launchpad.net/~phablet-team/qtvideo-node/trunk
 
 Package: qtvideonode-plugin
 Architecture: armel armhf
-Depends: ${misc:Depends}, ${shlibs:Depends}
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
 Description: Plugin for showing camera viewfinder in Qt
   Plugin for showing camera viewfinder in Qt as well as the video surface in the
   media-player
