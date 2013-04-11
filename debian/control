@@ -2,27 +2,29 @@ Source: qtvideonode-plugin
 Section: libs
 Priority: optional
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
-Build-Depends: debhelper (>= 8.0.0),
+Build-Depends: debhelper (>= 9),
                libgl-dev,
                libgles2-mesa-dev,
                libhybris-dev,
                libpulse-dev,
-               qt5-default,
-               qtmultimedia5-dev,
-               qtdeclarative5-dev,
-               qtmultimedia5-private-dev,
-               qtdeclarative5-private-dev,
                libqt5opengl5-dev,
                libqtubuntu-media-signals-dev,
-               pkg-config
-Standards-Version: 3.9.3
-Vcs-Bzr: lp:qtubuntu-camera/qtvideonode
-Vcs-Browser: https://code.launchpad.net/qtubuntu-camera/qtvideonode
+               pkg-config,
+               qt5-default,
+               qtdeclarative5-dev,
+               qtdeclarative5-private-dev,
+               qtmultimedia5-dev,
+               qtmultimedia5-private-dev,
+Standards-Version: 3.9.4
+Homepage: https://launchpad.net/qtvideo-node
+# If you aren't a member of ~phablet-team but need to upload packaging changes,
+# just go ahead.  ~phablet-team will notice and sync up the code again.
+Vcs-Bzr: https://code.launchpad.net/~phablet-team/qtvideo-node/trunk
 
 Package: qtvideonode-plugin
 Architecture: armel armhf
-Depends: ${shlibs:Depends},
-         ${misc:Depends}
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
 Description: Plugin for showing camera viewfinder in Qt
   Plugin for showing camera viewfinder in Qt as well as the video surface in the
   media-player
