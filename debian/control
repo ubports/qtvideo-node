@@ -1,4 +1,4 @@
-Source: qtvideonode-plugin
+Source: qtvideo-node
 Section: libs
 Priority: optional
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
