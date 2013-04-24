@@ -46,11 +46,13 @@ void tst_ShaderVideoNode::testCameraSetCurrentFrame()
     QVideoFrame frame(img);
 
     node.setCurrentFrame(frame);
-    QCOMPARE((int)node.m_material->cameraControl(), 0);
+    QCOMPARE(QVariant(QMetaType::VoidStar, node.m_material->cameraControl()),
+             QVariant(QMetaType::VoidStar, 0));
 
-    frame.setMetaData("CamControl", (int)cc);
+    frame.setMetaData("CamControl", QVariant::fromValue((void*)cc));
     node.setCurrentFrame(frame);
-    QCOMPARE((int)node.m_material->cameraControl(), (int)cc);
+    QCOMPARE(QVariant(QMetaType::VoidStar, node.m_material->cameraControl()),
+             QVariant(QMetaType::VoidStar, cc));
 }
 
 void tst_ShaderVideoNode::testMediaPlayerSetCurrentFrame()
@@ -63,11 +65,13 @@ void tst_ShaderVideoNode::testMediaPlayerSetCurrentFrame()
     QVideoFrame frame(img);
 
     node.setCurrentFrame(frame);
-    QCOMPARE((int)node.m_material->mediaplayerControl(), 0);
+    QCOMPARE(QVariant(QMetaType::VoidStar, node.m_material->mediaplayerControl()),
+             QVariant(QMetaType::VoidStar, 0));
 
-    frame.setMetaData("MediaPlayerControl", (int)mp);
+    frame.setMetaData("MediaPlayerControl", QVariant::fromValue((void*)mp));
     node.setCurrentFrame(frame);
-    QCOMPARE((int)node.m_material->mediaplayerControl(), (int)mp);
+    QCOMPARE(QVariant(QMetaType::VoidStar, node.m_material->mediaplayerControl()),
+             QVariant(QMetaType::VoidStar, mp));
 }
 
 QTEST_MAIN(tst_ShaderVideoNode)

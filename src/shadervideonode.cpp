@@ -55,16 +55,16 @@ void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
             return;
         }
 
-        int ci = 0;
+        void *ci = 0;
         if (frame.availableMetaData().contains("CamControl")) {
-            ci = frame.metaData("CamControl").toInt();
+            ci = frame.metaData("CamControl").value<void *>();
             if (ci == 0) {
                 qWarning() << "No valid camera control pointer in video frame";
                 return;
             }
             m_material->setCamControl((CameraControl*)ci);
         } else if (frame.availableMetaData().contains("MediaPlayerControl")) {
-            ci = frame.metaData("MediaPlayerControl").toInt();
+            ci = frame.metaData("MediaPlayerControl").value<void *>();
             if (ci == 0) {
                 qWarning() << "No valid media player control pointer in video frame";
                 return;

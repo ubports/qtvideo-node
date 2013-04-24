@@ -14,6 +14,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <ubuntu/ui/config.h>
+
+#if UBUNTU_USE_GLES
+# include <GLES2/gl2.h>
+# define TEXTURE_TARGET GL_TEXTURE_EXTERNAL_OES
+#else
+# define GL_GLEXT_PROTOTYPES
+# include <GL/gl.h>
+# include <GL/glext.h>
+# define TEXTURE_TARGET GL_TEXTURE_2D
+#endif
+
 #include "shadervideomaterial.h"
 #include "shadervideoshader.h"
 
@@ -81,10 +93,10 @@ void ShaderVideoMaterial::bind()
     undoAndroidYFlip(m_textureMatrix);
     glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_FALSE, m_textureMatrix);
 
-    glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 }
 
 void ShaderVideoMaterial::undoAndroidYFlip(GLfloat matrix[])
