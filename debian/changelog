@@ -1,4 +1,4 @@
-qtvideo-node (0.2.1-0ubuntu1) UNRELEASED; urgency=low
+qtvideo-node (0.2.1daily13.05.22ubuntu.unity.next-0ubuntu1) raring; urgency=low
 
   [ Robert Bruce Park ]
   * Fixing up some minor packaging issues.
@@ -8,7 +8,13 @@ qtvideo-node (0.2.1-0ubuntu1) UNRELEASED; urgency=low
     - Rename the source packge to qtvideo-node
   * Automatic snapshot from revision 27 (bootstrap)
 
- -- Robert Bruce Park <robert.park@canonical.com>  Thu, 14 Mar 2013 17:43:20 -0700
+  [ Michael Terry ]
+  * Allow qtvideo-node to support all 3 major arches.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 29 (ubuntu-unity/next)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 22 May 2013 04:27:55 +0000
 
 qtvideonode-plugin (0.2.1) quantal; urgency=low
 
