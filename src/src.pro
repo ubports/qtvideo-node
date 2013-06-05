@@ -11,7 +11,7 @@ target.path += $$[QT_INSTALL_PLUGINS]/$${PLUGIN_TYPE}
 INSTALLS = target
 
 INCLUDEPATH += /usr/include/hybris/camera /usr/include/hybris/media /usr/include/libqtubuntu-media-signals
-LIBS += -lhybris_ics -lcamera -lmediaplayer -lqtubuntu-media-signals
+LIBS += -lhybris_ics -lcamera -lmedia -lqtubuntu-media-signals
 
 OTHER_FILES += shadervideonode.json
 
