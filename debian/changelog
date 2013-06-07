@@ -1,3 +1,16 @@
+qtvideo-node (0.2.1daily13.06.07-0ubuntu1) saucy; urgency=low
+
+  [ Michael Terry ]
+  * Allow qtvideo-node to support all 3 major arches.
+
+  [ Łukasz 'sil2100' Zemczak ]
+  * With the new libhybris, it's not called -lmediaplayer but -lmedia.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 31
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 07 Jun 2013 04:01:54 +0000
+
 qtvideo-node (0.2.1daily13.05.22ubuntu.unity.next-0ubuntu1) raring; urgency=low
 
   [ Robert Bruce Park ]
