@@ -14,17 +14,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <ubuntu/ui/config.h>
-
-#if UBUNTU_USE_GLES
-# include <GLES2/gl2.h>
+#ifdef QT_OPENGL_ES_2
 # define TEXTURE_TARGET GL_TEXTURE_EXTERNAL_OES
 #else
-# define GL_GLEXT_PROTOTYPES
-# include <GL/gl.h>
-# include <GL/glext.h>
 # define TEXTURE_TARGET GL_TEXTURE_2D
+# define GL_GLEXT_PROTOTYPES
 #endif
+
+#include <QGLShaderProgram>
 
 #include "shadervideomaterial.h"
 #include "shadervideoshader.h"

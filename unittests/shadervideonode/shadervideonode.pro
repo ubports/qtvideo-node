@@ -2,6 +2,9 @@ CONFIG += testcase
 CONFIG += no_private_qt_headers_warning
 TARGET = tst_shadervideonode
 
+# We don't want to install unit tests anywhere as it doesn't make sense
+target.CONFIG += no_default_install
+
 include(../../coverage.pri)
 
 QT += testlib multimedia-private qtmultimediaquicktools-private opengl
