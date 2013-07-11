@@ -3,7 +3,6 @@ Section: libs
 Priority: optional
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 Build-Depends: debhelper (>= 9),
-               libgl-dev,
                libgl1-mesa-dev[!armhf],
                libgles2-mesa-dev[armhf],
                libhybris-dev,
@@ -28,5 +27,5 @@ Architecture: i386 amd64 armhf
 Depends: ${misc:Depends},
          ${shlibs:Depends},
 Description: Plugin for showing camera viewfinder in Qt
-  Plugin for showing camera viewfinder in Qt as well as the video surface in the
-  media-player
+ Plugin for showing camera viewfinder in Qt as well as the video surface in the
+ media-player
