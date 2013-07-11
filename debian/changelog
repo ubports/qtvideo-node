@@ -1,3 +1,12 @@
+qtvideo-node (0.2.1daily13.06.07-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/copyright
+    - fixed Upstream-Name
+  * debian/control
+    - build for Arch any again
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Thu, 11 Jul 2013 09:39:51 -0400
+
 qtvideo-node (0.2.1daily13.06.07-0ubuntu1) saucy; urgency=low
 
   [ Michael Terry ]
@@ -92,7 +101,7 @@ qtvideonode-plugin (0.1.6) quantal; urgency=low
 
   * Fixed video playback artifact box.
 
- -- Jim Hodapp <jhodapp@trinity>  Fri, 30 Nov 2012 12:18:49 -0500
+ -- Jim Hodapp <jim.hodapp@canonical.com>  Fri, 30 Nov 2012 12:18:49 -0500
 
 qtvideonode-plugin (0.1.5) quantal; urgency=low
 

@@ -23,7 +23,7 @@ Homepage: https://launchpad.net/qtvideo-node
 Vcs-Bzr: https://code.launchpad.net/~phablet-team/qtvideo-node/trunk
 
 Package: qtvideonode-plugin
-Architecture: i386 amd64 armhf
+Architecture: any
 Depends: ${misc:Depends},
          ${shlibs:Depends},
 Description: Plugin for showing camera viewfinder in Qt
