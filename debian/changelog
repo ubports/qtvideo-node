@@ -1,3 +1,12 @@
+qtvideo-node (0.2.1daily13.06.07-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/copyright
+    - fixed Upstream-Name
+  * debian/control
+    - build for Arch any again
+
+ -- Ken VanDine <ken.vandine@canonical.com>  Thu, 11 Jul 2013 09:39:51 -0400
+
 qtvideo-node (0.2.1daily13.06.07-0ubuntu1) saucy; urgency=low
 
   [ Michael Terry ]
