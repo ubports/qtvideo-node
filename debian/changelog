@@ -1,11 +1,19 @@
-qtvideo-node (0.2.1daily13.06.07-0ubuntu2) UNRELEASED; urgency=low
+qtvideo-node (0.2.1+13.10.20130712-0ubuntu1) saucy; urgency=low
 
+  [ Ken VanDine ]
   * debian/copyright
     - fixed Upstream-Name
   * debian/control
     - build for Arch any again
 
- -- Ken VanDine <ken.vandine@canonical.com>  Thu, 11 Jul 2013 09:39:51 -0400
+  [ Łukasz 'sil2100' Zemczak ]
+  * Fix building with newer platform-api, fix some lintian warnings, do
+    not install unit tests anywhere.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 34
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 12 Jul 2013 04:01:46 +0000
 
 qtvideo-node (0.2.1daily13.06.07-0ubuntu1) saucy; urgency=low
 
