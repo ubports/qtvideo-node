@@ -40,7 +40,7 @@ ShaderVideoNode::~ShaderVideoNode()
 {
 #ifndef TST_NO_OPENGL
     glDeleteTextures(1, &m_textureId);
-#else
+#endif
     m_textureId = 0;
 
     delete m_snapshotGenerator;
