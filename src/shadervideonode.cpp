@@ -38,6 +38,11 @@ ShaderVideoNode::ShaderVideoNode(const QVideoSurfaceFormat &format) :
 
 ShaderVideoNode::~ShaderVideoNode()
 {
+#ifndef TST_NO_OPENGL
+    glDeleteTextures(1, &m_textureId);
+#endif
+    m_textureId = 0;
+
     delete m_snapshotGenerator;
 }
 
