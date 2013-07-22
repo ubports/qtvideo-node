@@ -1,3 +1,13 @@
+qtvideo-node (0.2.1+13.10.20130722-0ubuntu1) saucy; urgency=low
+
+  [ Guenter Schwann ]
+  * Clean up GL texture.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 36
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 22 Jul 2013 04:59:52 +0000
+
 qtvideo-node (0.2.1+13.10.20130712-0ubuntu1) saucy; urgency=low
 
   [ Ken VanDine ]
