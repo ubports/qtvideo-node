@@ -41,6 +41,7 @@ private Q_SLOTS:
 
 private:
     void getGLTextureID();
+    void deleteTextureID();
 
     QVideoSurfaceFormat m_format;
     ShaderVideoMaterial *m_material;

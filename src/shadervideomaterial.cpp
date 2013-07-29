@@ -54,7 +54,9 @@ QSGMaterialType *ShaderVideoMaterial::type() const
 
 void ShaderVideoMaterial::setCamControl(CameraControl *cc)
 {
-    m_camControl = cc;
+    if (m_camControl != cc) {
+        m_camControl = cc;
+    }
 }
 
 CameraControl *ShaderVideoMaterial::cameraControl() const
@@ -75,7 +77,6 @@ MediaPlayerWrapper *ShaderVideoMaterial::mediaplayerControl() const
 void ShaderVideoMaterial::bind()
 {
     if (!m_camControl && !m_mediaPlayerControl) {
-        qWarning() << "No valid CameraControl or MediaPlayerWrapper instance.";
         return;
     }
 

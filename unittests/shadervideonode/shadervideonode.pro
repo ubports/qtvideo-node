@@ -22,8 +22,12 @@ SOURCES += tst_shadervideonode.cpp \
     camera.cpp \
     player.cpp
 
-HEADERS += camera_compatibility_layer.h \
-           media_compatibility_layer.h
+HEADERS += .    ../../src/shadervideomaterial.h \
+    ../../src/shadervideonode.h \
+    ../../src/shadervideoshader.h \
+    ../../src/snapshotgenerator.h \
+    camera_compatibility_layer.h \
+    media_compatibility_layer.h
 
 INCLUDEPATH += ../../src /usr/include/hybris/camera /usr/include/libqtubuntu-media-signals
 LIBS += -lqtubuntu-media-signals
