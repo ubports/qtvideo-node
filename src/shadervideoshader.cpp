@@ -19,7 +19,7 @@
 
 ShaderVideoShader::ShaderVideoShader(QVideoFrame::PixelFormat pixelFormat)
     : QSGMaterialShader(),
-    m_pixelFormat(pixelFormat)
+      m_pixelFormat(pixelFormat)
 {
 }
 

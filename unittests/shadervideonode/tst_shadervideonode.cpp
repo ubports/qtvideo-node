@@ -36,14 +36,43 @@ private slots:
     void testMediaPlayerSetCurrentFrame();
 };
 
+class GLTextureBuffer : public QAbstractVideoBuffer
+{
+public:
+    GLTextureBuffer(unsigned int textureId) :
+        QAbstractVideoBuffer(QAbstractVideoBuffer::GLTextureHandle),
+        m_textureId(textureId)
+    {
+    }
+
+    MapMode mapMode() const { return NotMapped; }
+    uchar *map(MapMode mode, int *numBytes, int *bytesPerLine)
+    {
+        Q_UNUSED(mode);
+        Q_UNUSED(numBytes);
+        Q_UNUSED(bytesPerLine);
+        return (uchar*)0;
+    }
+
+    void unmap() {}
+
+    QVariant handle() const
+    {
+        return QVariant::fromValue<unsigned int>(m_textureId);
+    }
+
+
+private:
+    unsigned int m_textureId;
+};
+
 void tst_ShaderVideoNode::testCameraSetCurrentFrame()
 {
     QVideoSurfaceFormat format;
     ShaderVideoNode node(format);
 
     CameraControl *cc = new CameraControl;
-    QImage img(320, 240, QImage::Format_ARGB32);
-    QVideoFrame frame(img);
+    QVideoFrame frame(new GLTextureBuffer(1), QSize(320, 240), QVideoFrame::Format_RGB32);
 
     node.setCurrentFrame(frame);
     QCOMPARE(QVariant(QMetaType::VoidStar, node.m_material->cameraControl()),
@@ -61,8 +90,7 @@ void tst_ShaderVideoNode::testMediaPlayerSetCurrentFrame()
     ShaderVideoNode node(format);
 
     MediaPlayerWrapper *mp = android_media_new_player();
-    QImage img(1920, 800, QImage::Format_ARGB32);
-    QVideoFrame frame(img);
+    QVideoFrame frame(new GLTextureBuffer(1), QSize(1920, 80), QVideoFrame::Format_RGB32);
 
     node.setCurrentFrame(frame);
     QCOMPARE(QVariant(QMetaType::VoidStar, node.m_material->mediaplayerControl()),
@@ -77,4 +105,3 @@ void tst_ShaderVideoNode::testMediaPlayerSetCurrentFrame()
 QTEST_MAIN(tst_ShaderVideoNode)
 
 #include "tst_shadervideonode.moc"
-#include "moc_shadervideonode.cpp"
