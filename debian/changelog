@@ -1,3 +1,14 @@
+qtvideo-node (0.2.1+13.10.20130730-0ubuntu1) saucy; urgency=low
+
+  [ Guenter Schwann ]
+  * Generate and return a new texture ID when a frame with a 0 ID is
+    send. Block redraws meanwhile. .
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 38
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 30 Jul 2013 04:40:54 +0000
+
 qtvideo-node (0.2.1+13.10.20130722-0ubuntu1) saucy; urgency=low
 
   [ Guenter Schwann ]
