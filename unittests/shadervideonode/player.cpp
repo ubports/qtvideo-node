@@ -15,6 +15,7 @@
  */
 
 #include "media_compatibility_layer.h"
+#include "surface_texture_client_hybris.h"
 
 #include <QtGlobal>
 
@@ -37,5 +38,10 @@ void android_media_update_surface_texture(MediaPlayerWrapper *mp)
 void android_media_surface_texture_get_transformation_matrix(MediaPlayerWrapper *mp, GLfloat* matrix)
 {
     Q_UNUSED(mp);
+    Q_UNUSED(matrix);
+}
+
+void surface_texture_client_get_transformation_matrix(GLfloat *matrix)
+{
     Q_UNUSED(matrix);
 }

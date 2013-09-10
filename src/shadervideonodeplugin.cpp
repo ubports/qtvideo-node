@@ -17,6 +17,8 @@
 #include "shadervideonodeplugin.h"
 #include "shadervideonode.h"
 
+#include <QtCore/qdebug.h>
+
 QList<QVideoFrame::PixelFormat> ShaderVideoNodePlugin::supportedPixelFormats(
                                         QAbstractVideoBuffer::HandleType handleType) const
 {
@@ -35,6 +37,8 @@ QList<QVideoFrame::PixelFormat> ShaderVideoNodePlugin::supportedPixelFormats(
 
 QSGVideoNode *ShaderVideoNodePlugin::createNode(const QVideoSurfaceFormat &format)
 {
+    qDebug() << Q_FUNC_INFO;
+
     if (supportedPixelFormats(format.handleType()).contains(format.pixelFormat()))
         return new ShaderVideoNode(format);
 

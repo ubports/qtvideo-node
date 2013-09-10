@@ -23,11 +23,13 @@
 
 #include <QGLShaderProgram>
 
+#include <QtCore/qdebug.h>
+
 #include "shadervideomaterial.h"
 #include "shadervideoshader.h"
 
 #include <camera_compatibility_layer.h>
-#include <media_compatibility_layer.h>
+#include <surface_texture_client_hybris.h>
 
 ShaderVideoShader *ShaderVideoMaterial::m_videoShader = 0;
 
@@ -36,6 +38,7 @@ ShaderVideoMaterial::ShaderVideoMaterial(const QVideoSurfaceFormat &format)
     m_camControl(0),
     m_mediaPlayerControl(NULL)
 {
+    qDebug() << Q_FUNC_INFO;
 }
 
 QSGMaterialShader *ShaderVideoMaterial::createShader() const
@@ -76,18 +79,26 @@ MediaPlayerWrapper *ShaderVideoMaterial::mediaplayerControl() const
 
 void ShaderVideoMaterial::bind()
 {
-    if (!m_camControl && !m_mediaPlayerControl) {
+    qDebug() << Q_FUNC_INFO;
+#if 0
+    //if (!m_camControl && !m_mediaPlayerControl) {
+    if (!m_camControl) {
+        qWarning() << "Returning from " << Q_FUNC_INFO;
         return;
     }
+#endif
 
     if (m_camControl != NULL) {
         android_camera_update_preview_texture(m_camControl);
         android_camera_get_preview_texture_transformation(m_camControl, m_textureMatrix);
     }
-    else if (m_mediaPlayerControl != NULL) {
-        android_media_update_surface_texture(m_mediaPlayerControl);
-        android_media_surface_texture_get_transformation_matrix(m_mediaPlayerControl, m_textureMatrix);
+    else {
+        //android_media_update_surface_texture(m_mediaPlayerControl);
+        //android_media_surface_texture_get_transformation_matrix(m_mediaPlayerControl, m_textureMatrix);
+        surface_texture_client_get_transformation_matrix(m_textureMatrix);
+        printGLMaxtrix(m_textureMatrix);
     }
+
     undoAndroidYFlip(m_textureMatrix);
     glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_FALSE, m_textureMatrix);
 

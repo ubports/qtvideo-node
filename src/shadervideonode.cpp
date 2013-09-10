@@ -84,7 +84,7 @@ void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
         qWarning() << "No camera control or media player control instance included in video frame";
         m_material->setCamControl(0);
 //        m_material->setMediaPlayerControl(0);
-        return;
+        //return;
     }
 
     if (frame.handle().toUInt() == 0) {
@@ -96,6 +96,7 @@ void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
         m_material->setCamControl(0);
 //        m_material->setMediaPlayerControl(0);
     } else {
+        qDebug() << "Marking the frame as dirty (draw it)";
         // draw the frame
         markDirty(DirtyMaterial);
     }
