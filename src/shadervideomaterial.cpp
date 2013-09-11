@@ -36,9 +36,8 @@ ShaderVideoShader *ShaderVideoMaterial::m_videoShader = 0;
 ShaderVideoMaterial::ShaderVideoMaterial(const QVideoSurfaceFormat &format)
     : m_format(format),
     m_camControl(0),
-    m_mediaPlayerControl(NULL)
+    m_textureId(0)
 {
-    qDebug() << Q_FUNC_INFO;
 }
 
 QSGMaterialShader *ShaderVideoMaterial::createShader() const
@@ -67,36 +66,24 @@ CameraControl *ShaderVideoMaterial::cameraControl() const
     return m_camControl;
 }
 
-void ShaderVideoMaterial::setMediaPlayerControl(MediaPlayerWrapper *mp)
+void ShaderVideoMaterial::setTextureId(GLuint textureId)
 {
-    m_mediaPlayerControl = mp;
-}
-
-MediaPlayerWrapper *ShaderVideoMaterial::mediaplayerControl() const
-{
-    return m_mediaPlayerControl;
+    m_textureId = textureId;
 }
 
 void ShaderVideoMaterial::bind()
 {
-    qDebug() << Q_FUNC_INFO;
-#if 0
-    //if (!m_camControl && !m_mediaPlayerControl) {
-    if (!m_camControl) {
-        qWarning() << "Returning from " << Q_FUNC_INFO;
+    if (!m_camControl && !m_textureId) {
         return;
     }
-#endif
 
     if (m_camControl != NULL) {
         android_camera_update_preview_texture(m_camControl);
         android_camera_get_preview_texture_transformation(m_camControl, m_textureMatrix);
     }
     else {
-        //android_media_update_surface_texture(m_mediaPlayerControl);
-        //android_media_surface_texture_get_transformation_matrix(m_mediaPlayerControl, m_textureMatrix);
+        surface_texture_client_update_texture();
         surface_texture_client_get_transformation_matrix(m_textureMatrix);
-        printGLMaxtrix(m_textureMatrix);
     }
 
     undoAndroidYFlip(m_textureMatrix);
