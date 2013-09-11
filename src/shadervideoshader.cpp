@@ -30,7 +30,6 @@ void ShaderVideoShader::updateState(const RenderState &state,
     Q_UNUSED(oldMaterial);
     ShaderVideoMaterial *mat = dynamic_cast<ShaderVideoMaterial *>(newMaterial);
     program()->setUniformValue(m_id_Texture, 0);
-    //qDebug() << "m_id_Texture: " << m_id_Texture;
 
     if (state.isMatrixDirty())
         program()->setUniformValue(m_id_matrix, state.combinedMatrix());
