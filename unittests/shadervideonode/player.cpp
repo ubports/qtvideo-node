@@ -18,7 +18,7 @@
 
 #include <QtGlobal>
 
-void surface_texture_client_get_transformation_matrix(GLfloat *matrix)
+void surface_texture_client_get_transformation_matrix(float *matrix)
 {
     Q_UNUSED(matrix);
 }

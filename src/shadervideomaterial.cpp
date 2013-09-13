@@ -83,7 +83,7 @@ void ShaderVideoMaterial::bind()
     }
     else {
         surface_texture_client_update_texture();
-        surface_texture_client_get_transformation_matrix(m_textureMatrix);
+        surface_texture_client_get_transformation_matrix(static_cast<float*>(m_textureMatrix));
     }
 
     undoAndroidYFlip(m_textureMatrix);
