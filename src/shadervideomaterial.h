@@ -37,8 +37,8 @@ public:
     void setCamControl(CameraControl *cc);
     CameraControl *cameraControl() const;
 
-    void setMediaPlayerControl(MediaPlayerWrapper *mp);
-    MediaPlayerWrapper *mediaplayerControl() const;
+    void setTextureId(GLuint textureId);
+    GLuint textureId() const { return m_textureId; }
 
     void bind();
 
@@ -48,7 +48,7 @@ private:
 
     QVideoSurfaceFormat m_format;
     CameraControl *m_camControl;
-    MediaPlayerWrapper *m_mediaPlayerControl;
+    GLuint m_textureId;
     static ShaderVideoShader *m_videoShader; // the shader is cached in the Qt scene graph
     GLfloat m_textureMatrix[16];
 };

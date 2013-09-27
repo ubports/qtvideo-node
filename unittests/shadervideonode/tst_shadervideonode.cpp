@@ -23,7 +23,7 @@
 #include <shadervideomaterial.h>
 
 #include "camera_compatibility_layer.h"
-#include "media_compatibility_layer.h"
+#include "surface_texture_client_hybris.h"
 
 #define private public
 #include "shadervideonode.h"
@@ -33,7 +33,7 @@ class tst_ShaderVideoNode : public QObject
     Q_OBJECT
 private slots:
     void testCameraSetCurrentFrame();
-    void testMediaPlayerSetCurrentFrame();
+    void testTextureIdSetCurrentFrame();
 };
 
 class GLTextureBuffer : public QAbstractVideoBuffer
@@ -84,22 +84,19 @@ void tst_ShaderVideoNode::testCameraSetCurrentFrame()
              QVariant(QMetaType::VoidStar, cc));
 }
 
-void tst_ShaderVideoNode::testMediaPlayerSetCurrentFrame()
+void tst_ShaderVideoNode::testTextureIdSetCurrentFrame()
 {
     QVideoSurfaceFormat format;
     ShaderVideoNode node(format);
 
-    MediaPlayerWrapper *mp = android_media_new_player();
     QVideoFrame frame(new GLTextureBuffer(1), QSize(1920, 80), QVideoFrame::Format_RGB32);
 
     node.setCurrentFrame(frame);
-    QCOMPARE(QVariant(QMetaType::VoidStar, node.m_material->mediaplayerControl()),
-             QVariant(QMetaType::VoidStar, 0));
+    QCOMPARE(node.m_material->textureId(), (const GLuint)0);
 
-    frame.setMetaData("MediaPlayerControl", QVariant::fromValue((void*)mp));
+    frame.setMetaData("TextureId", 70001);
     node.setCurrentFrame(frame);
-    QCOMPARE(QVariant(QMetaType::VoidStar, node.m_material->mediaplayerControl()),
-             QVariant(QMetaType::VoidStar, mp));
+    QCOMPARE(node.m_material->textureId(), (const GLuint)70001);
 }
 
 QTEST_MAIN(tst_ShaderVideoNode)

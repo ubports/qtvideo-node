@@ -19,7 +19,6 @@
 #include "snapshotgenerator.h"
 
 #include <camera_compatibility_layer.h>
-#include <QDebug>
 #include <qtubuntu_media_signals.h>
 
 /*!
@@ -72,31 +71,30 @@ void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
             return;
         }
         m_material->setCamControl((CameraControl*)ci);
-    } else if (frame.availableMetaData().contains("MediaPlayerControl")) {
-        ci = frame.metaData("MediaPlayerControl").value<void *>();
-        if (ci == 0) {
-            qWarning() << "No valid media player control pointer in video frame";
+    } else if (frame.availableMetaData().contains("TextureId")) {
+        m_textureId = frame.metaData("TextureId").value<GLuint>();
+        if (m_textureId == 0) {
+            qWarning() << "No valid textureId in video frame";
             return;
         }
-        m_material->setMediaPlayerControl((MediaPlayerWrapper*)ci);
+        m_material->setTextureId(m_textureId);
     } else if (!frame.availableMetaData().contains("CamControl") &&
-               !frame.availableMetaData().contains("MediaPlayerControl")) {
-        qWarning() << "No camera control or media player control instance included in video frame";
+               !frame.availableMetaData().contains("TextureId")) {
+        qWarning() << "No camera control or texture id instance included in video frame";
         m_material->setCamControl(0);
-//        m_material->setMediaPlayerControl(0);
+        m_material->setTextureId(0);
         return;
     }
 
     if (frame.handle().toUInt() == 0) {
-        // client requests a new texture
+        // Client requests a new texture
         if (m_textureId != 0)
             deleteTextureID();
         getGLTextureID();
-        // prevent drawing
+        // Prevent drawing
         m_material->setCamControl(0);
-//        m_material->setMediaPlayerControl(0);
     } else {
-        // draw the frame
+        // Draw the frame
         markDirty(DirtyMaterial);
     }
 }
