@@ -1,3 +1,16 @@
+qtvideo-node (0.2.1+13.10.20130928.1-0ubuntu1) saucy; urgency=low
+
+  [ Jim Hodapp ]
+  * * Make qtvideo-node work with the new GStreamer backend for video
+    playback. Verified this still works with the camera-app. * Modified
+    to work with the new SurfaceTextureClientHybris and new GStreamer
+    backend.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 40
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Sat, 28 Sep 2013 22:29:23 +0000
+
 qtvideo-node (0.2.1+13.10.20130730-0ubuntu1) saucy; urgency=low
 
   [ Guenter Schwann ]
