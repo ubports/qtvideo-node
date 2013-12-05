@@ -36,7 +36,8 @@ ShaderVideoShader *ShaderVideoMaterial::m_videoShader = 0;
 ShaderVideoMaterial::ShaderVideoMaterial(const QVideoSurfaceFormat &format)
     : m_format(format),
     m_camControl(0),
-    m_textureId(0)
+    m_textureId(0),
+    m_surfaceTextureClient(0)
 {
 }
 
@@ -71,6 +72,11 @@ void ShaderVideoMaterial::setTextureId(GLuint textureId)
     m_textureId = textureId;
 }
 
+void ShaderVideoMaterial::setSurfaceTextureClient(SurfaceTextureClientHybris surface_texture_client)
+{
+    m_surfaceTextureClient = surface_texture_client;
+}
+
 void ShaderVideoMaterial::bind()
 {
     if (!m_camControl && !m_textureId) {
@@ -82,8 +88,8 @@ void ShaderVideoMaterial::bind()
         android_camera_get_preview_texture_transformation(m_camControl, m_textureMatrix);
     }
     else {
-        surface_texture_client_update_texture();
-        surface_texture_client_get_transformation_matrix(static_cast<float*>(m_textureMatrix));
+        surface_texture_client_update_texture(m_surfaceTextureClient);
+        surface_texture_client_get_transformation_matrix(m_surfaceTextureClient, static_cast<float*>(m_textureMatrix));
     }
 
     undoAndroidYFlip(m_textureMatrix);

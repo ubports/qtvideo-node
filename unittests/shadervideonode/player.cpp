@@ -18,11 +18,15 @@
 
 #include <QtGlobal>
 
-void surface_texture_client_get_transformation_matrix(float *matrix)
+typedef void* SurfaceTextureClientHybris;
+
+void surface_texture_client_get_transformation_matrix(SurfaceTextureClientHybris stc, float *matrix)
 {
+    Q_UNUSED(stc);
     Q_UNUSED(matrix);
 }
 
-void surface_texture_client_update_texture()
+void surface_texture_client_update_texture(SurfaceTextureClientHybris stc)
 {
+    Q_UNUSED(stc);
 }
