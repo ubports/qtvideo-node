@@ -95,6 +95,7 @@ void tst_ShaderVideoNode::testTextureIdSetCurrentFrame()
     QCOMPARE(node.m_material->textureId(), (const GLuint)0);
 
     frame.setMetaData("TextureId", 70001);
+    frame.setMetaData("SurfaceTextureClient", 0x1);
     node.setCurrentFrame(frame);
     QCOMPARE(node.m_material->textureId(), (const GLuint)70001);
 }
