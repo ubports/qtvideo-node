@@ -1,3 +1,12 @@
+qtvideo-node (0.2.1+14.04.20131223.1-0ubuntu1) trusty; urgency=medium
+
+  * Updated to support passing a SurfaceTextureClientHybris instance
+    embedded in the frame's metadata. This removes the need for a
+    singleton SurfaceTextureClientHybris instance in the hybris media
+    layer.
+
+ -- Ricardo Salveti de Araujo <ricardo.salveti@canonical.com>  Mon, 23 Dec 2013 18:24:06 -0200
+
 qtvideo-node (0.2.1+13.10.20130928.1-0ubuntu1) saucy; urgency=low
 
   [ Jim Hodapp ]
