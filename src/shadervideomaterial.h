@@ -28,6 +28,8 @@ class ShaderVideoShader;
 class ShaderVideoMaterial : public QSGMaterial
 {
 public:
+    typedef void* SurfaceTextureClientHybris;
+
     ShaderVideoMaterial(const QVideoSurfaceFormat &format);
 
     QSGMaterialShader *createShader() const;
@@ -40,6 +42,8 @@ public:
     void setTextureId(GLuint textureId);
     GLuint textureId() const { return m_textureId; }
 
+    void setSurfaceTextureClient(SurfaceTextureClientHybris surface_texture_client);
+
     void bind();
 
 private:
@@ -49,6 +53,7 @@ private:
     QVideoSurfaceFormat m_format;
     CameraControl *m_camControl;
     GLuint m_textureId;
+    SurfaceTextureClientHybris m_surfaceTextureClient;
     static ShaderVideoShader *m_videoShader; // the shader is cached in the Qt scene graph
     GLfloat m_textureMatrix[16];
 };

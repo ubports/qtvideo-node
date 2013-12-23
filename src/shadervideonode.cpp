@@ -27,7 +27,8 @@
  */
 ShaderVideoNode::ShaderVideoNode(const QVideoSurfaceFormat &format) :
     m_format(format),
-    m_textureId(0)
+    m_textureId(0),
+    m_surfaceTextureClient(0)
 {
     m_material = new ShaderVideoMaterial(format);
     setMaterial(m_material);
@@ -71,13 +72,22 @@ void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
             return;
         }
         m_material->setCamControl((CameraControl*)ci);
-    } else if (frame.availableMetaData().contains("TextureId")) {
+    } else if (frame.availableMetaData().contains("TextureId") &&
+               frame.availableMetaData().contains("SurfaceTextureClient")) {
         m_textureId = frame.metaData("TextureId").value<GLuint>();
         if (m_textureId == 0) {
             qWarning() << "No valid textureId in video frame";
             return;
         }
         m_material->setTextureId(m_textureId);
+
+        m_surfaceTextureClient = reinterpret_cast<SurfaceTextureClientHybris>
+            (frame.metaData("SurfaceTextureClient").value<unsigned int>());
+        if (m_surfaceTextureClient == 0) {
+            qWarning() << "No valid SurfaceTextureClient instance in video frame";
+            return;
+        }
+        m_material->setSurfaceTextureClient(m_surfaceTextureClient);
     } else if (!frame.availableMetaData().contains("CamControl") &&
                !frame.availableMetaData().contains("TextureId")) {
         qWarning() << "No camera control or texture id instance included in video frame";

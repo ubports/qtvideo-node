@@ -29,6 +29,8 @@ class ShaderVideoNode : public QObject, public QSGVideoNode
 {
     Q_OBJECT
 public:
+    typedef void* SurfaceTextureClientHybris;
+
     ShaderVideoNode(const QVideoSurfaceFormat &format);
     ~ShaderVideoNode();
 
@@ -46,6 +48,7 @@ private:
     QVideoSurfaceFormat m_format;
     ShaderVideoMaterial *m_material;
     GLuint m_textureId;
+    SurfaceTextureClientHybris m_surfaceTextureClient;
     SnapshotGenerator *m_snapshotGenerator;
 };
 
