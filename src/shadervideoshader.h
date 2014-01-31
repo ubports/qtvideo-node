@@ -17,7 +17,12 @@
 #ifndef SHADERVIDEOSHADER_H
 #define SHADERVIDEOSHADER_H
 
+#include <qglobal.h>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 2, 0))
 #include <QSGMaterialShader>
+#else
+#include <QtQuick/QSGMaterialShader>
+#endif
 #include <QVideoFrame>
 
 class ShaderVideoShader : public QSGMaterialShader

@@ -7,7 +7,7 @@ target.CONFIG += no_default_install
 
 include(../../coverage.pri)
 
-QT += testlib multimedia-private qtmultimediaquicktools-private opengl
+QT += testlib multimedia opengl quick-private
 
 # This is to avoid a segfault in shadervideonode.cpp when it tries to call
 # glGenTextures(), since the platform currently does not support real OpenGL
