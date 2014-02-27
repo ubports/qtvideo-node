@@ -19,6 +19,7 @@ SOURCES += tst_shadervideonode.cpp \
     ../../src/shadervideonode.cpp \
     ../../src/shadervideoshader.cpp \
     ../../src/snapshotgenerator.cpp \
+    ../../src/qsgvideonode_p.cpp \
     camera.cpp \
     player.cpp
 
@@ -26,6 +27,8 @@ HEADERS += .  ../../src/shadervideomaterial.h \
     ../../src/shadervideonode.h \
     ../../src/shadervideoshader.h \
     ../../src/snapshotgenerator.h \
+    ../../src/private/qtmultimediaquickdefs_p.h \
+    ../../src/private/qsgvideonode_p.h \
     camera_compatibility_layer.h \
     media_compatibility_layer.h \
     surface_texture_client_hybris.h
