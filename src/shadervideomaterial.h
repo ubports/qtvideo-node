@@ -17,7 +17,12 @@
 #ifndef SHADERVIDEOMATERIAL_H
 #define SHADERVIDEOMATERIAL_H
 
+#include <qglobal.h>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 2, 0))
 #include <QSGMaterial>
+#else
+#include <QtQuick/QSGMaterial>
+#endif
 #include <QVideoSurfaceFormat>
 #include <qgl.h>
 
