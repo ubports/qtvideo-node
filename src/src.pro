@@ -1,7 +1,7 @@
 TARGET = shadervideonode
 TEMPLATE = lib
 CONFIG += plugin
-QT += multimedia-private qtmultimediaquicktools-private opengl
+QT += multimedia qtmultimediaquicktools opengl
 
 include(../coverage.pri)
 

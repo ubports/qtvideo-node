@@ -72,6 +72,16 @@ void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
             return;
         }
         m_material->setCamControl((CameraControl*)ci);
+    } else if (frame.availableMetaData().contains("GetTextureId")) {
+        qDebug() << "Getting textureId from qtvideo-node";
+
+        if (frame.handle().toUInt() == 0) {
+            // Client requests a new texture
+            if (m_textureId != 0)
+                deleteTextureID();
+            getGLTextureID();
+            qDebug() << "qtvideo-node: got texture_id: " << m_textureId;
+        }
     } else if (frame.availableMetaData().contains("TextureId") &&
                frame.availableMetaData().contains("SurfaceTextureClient")) {
         m_textureId = frame.metaData("TextureId").value<GLuint>();
