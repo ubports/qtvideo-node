@@ -19,6 +19,7 @@
 #include <QtGlobal>
 
 typedef void* SurfaceTextureClientHybris;
+typedef void* GLConsumerWrapperHybris;
 
 void surface_texture_client_get_transformation_matrix(SurfaceTextureClientHybris stc, float *matrix)
 {
@@ -29,4 +30,15 @@ void surface_texture_client_get_transformation_matrix(SurfaceTextureClientHybris
 void surface_texture_client_update_texture(SurfaceTextureClientHybris stc)
 {
     Q_UNUSED(stc);
+}
+
+void gl_consumer_update_texture(GLConsumerWrapperHybris gl_consumer)
+{
+    Q_UNUSED(gl_consumer);
+}
+
+void gl_consumer_get_transformation_matrix(GLConsumerWrapperHybris gl_consumer, float *matrix)
+{
+    Q_UNUSED(gl_consumer);
+    Q_UNUSED(matrix);
 }

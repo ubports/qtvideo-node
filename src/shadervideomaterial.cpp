@@ -35,9 +35,11 @@ ShaderVideoShader *ShaderVideoMaterial::m_videoShader = 0;
 
 ShaderVideoMaterial::ShaderVideoMaterial(const QVideoSurfaceFormat &format)
     : m_format(format),
-    m_camControl(0),
-    m_textureId(0),
-    m_surfaceTextureClient(0)
+      m_camControl(0),
+      m_textureId(0),
+      m_surfaceTextureClient(0),
+      m_glConsumer(0),
+      m_readyToRender(false)
 {
 }
 
@@ -77,19 +79,27 @@ void ShaderVideoMaterial::setSurfaceTextureClient(SurfaceTextureClientHybris sur
     m_surfaceTextureClient = surface_texture_client;
 }
 
+void ShaderVideoMaterial::setGLConsumer(GLConsumerWrapperHybris gl_consumer)
+{
+    m_glConsumer = gl_consumer;
+}
+
 void ShaderVideoMaterial::bind()
 {
-    if (!m_camControl && !m_textureId) {
+    if (!m_camControl && !m_textureId && !m_glConsumer) {
         return;
     }
 
     if (m_camControl != NULL) {
         android_camera_update_preview_texture(m_camControl);
         android_camera_get_preview_texture_transformation(m_camControl, m_textureMatrix);
-    }
-    else {
-        surface_texture_client_update_texture(m_surfaceTextureClient);
-        surface_texture_client_get_transformation_matrix(m_surfaceTextureClient, static_cast<float*>(m_textureMatrix));
+    } else if (m_glConsumer != NULL && !m_readyToRender) {
+        m_readyToRender = true;
+    } else if (m_glConsumer != NULL && m_readyToRender) {
+        qDebug() << "gl_consumer_update_texture(): m_glConsumer: " << m_glConsumer;
+        gl_consumer_update_texture(m_glConsumer);
+        qDebug() << "gl_consumer_get_transformation_matrix()";
+        gl_consumer_get_transformation_matrix(m_glConsumer, static_cast<float*>(m_textureMatrix));
     }
 
     undoAndroidYFlip(m_textureMatrix);
