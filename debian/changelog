@@ -1,3 +1,22 @@
+qtvideo-node (0.2.1+14.04.20140304-0ubuntu1) trusty; urgency=low
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+  [ Ricardo Salveti de Araujo ]
+  * Initial Qt 5.2 support. Copy two header files from qtmultimedia
+    private headers. Only use Qt Declarative private headers (quick-
+    private) otherwise, and use version detection to support both 5.0
+    and 5.2. Disable unit tests temporarily. (LP: #1267818)
+
+  [ Timo Jyrinki ]
+  * Initial Qt 5.2 support. Copy two header files from qtmultimedia
+    private headers. Only use Qt Declarative private headers (quick-
+    private) otherwise, and use version detection to support both 5.0
+    and 5.2. Disable unit tests temporarily. (LP: #1267818)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 04 Mar 2014 13:44:19 +0000
+
 qtvideo-node (0.2.1+14.04.20131223.1-0ubuntu1) trusty; urgency=medium
 
   * Updated to support passing a SurfaceTextureClientHybris instance

@@ -1,7 +1,7 @@
 TARGET = shadervideonode
 TEMPLATE = lib
 CONFIG += plugin
-QT += multimedia-private qtmultimediaquicktools opengl
+QT += multimedia opengl quick-private
 
 include(../coverage.pri)
 
@@ -27,4 +27,5 @@ SOURCES += \
     shadervideomaterial.cpp \
     shadervideoshader.cpp \
     shadervideonode.cpp \
-    snapshotgenerator.cpp
+    snapshotgenerator.cpp \
+    qsgvideonode_p.cpp
