@@ -49,7 +49,6 @@ private:
     QVideoSurfaceFormat m_format;
     ShaderVideoMaterial *m_material;
     GLuint m_textureId;
-    SurfaceTextureClientHybris m_surfaceTextureClient;
     GLConsumerWrapperHybris m_glConsumer;
     SnapshotGenerator *m_snapshotGenerator;
 };

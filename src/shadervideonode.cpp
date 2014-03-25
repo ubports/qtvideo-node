@@ -29,7 +29,6 @@
 ShaderVideoNode::ShaderVideoNode(const QVideoSurfaceFormat &format) :
     m_format(format),
     m_textureId(0),
-    m_surfaceTextureClient(0),
     m_glConsumer(0)
 {
     m_material = new ShaderVideoMaterial(format);
