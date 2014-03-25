@@ -96,9 +96,7 @@ void ShaderVideoMaterial::bind()
     } else if (m_glConsumer != NULL && !m_readyToRender) {
         m_readyToRender = true;
     } else if (m_glConsumer != NULL && m_readyToRender) {
-        qDebug() << "gl_consumer_update_texture(): m_glConsumer: " << m_glConsumer;
         gl_consumer_update_texture(m_glConsumer);
-        qDebug() << "gl_consumer_get_transformation_matrix()";
         gl_consumer_get_transformation_matrix(m_glConsumer, static_cast<float*>(m_textureMatrix));
     }
 

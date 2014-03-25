@@ -67,13 +67,6 @@ QVideoFrame::PixelFormat ShaderVideoNode::pixelFormat() const
 void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
 {
     qDebug() << __PRETTY_FUNCTION__ << " frame: " << frame;
-#if 0
-    QMapIterator<QString, QVariant> i(frame.availableMetaData());
-    while (i.hasNext()) {
-        i.next();
-        qDebug() << "frame key: " << i.key();
-    }
-#endif
     void *ci = 0;
     if (frame.availableMetaData().contains("CamControl")) {
         ci = frame.metaData("CamControl").value<void *>();
