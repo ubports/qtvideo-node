@@ -18,7 +18,6 @@
 
 #include <QtGlobal>
 
-typedef void* SurfaceTextureClientHybris;
 typedef void* GLConsumerWrapperHybris;
 
 void surface_texture_client_get_transformation_matrix(SurfaceTextureClientHybris stc, float *matrix)
