@@ -103,6 +103,6 @@ void tst_ShaderVideoNode::testTextureIdSetCurrentFrame()
 }
 #endif
 
-QTEST_MAIN(tst_ShaderVideoNode)
+QTEST_GUILESS_MAIN(tst_ShaderVideoNode)
 
 #include "tst_shadervideonode.moc"

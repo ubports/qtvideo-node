@@ -74,15 +74,6 @@ void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
             return;
         }
         m_material->setCamControl((CameraControl*)ci);
-    } else if (frame.availableMetaData().contains("GetTextureId")) {
-        qDebug() << "** Getting textureId from qtvideo-node";
-        if (frame.handle().toUInt() == 0) {
-            // Client requests a new texture
-            if (m_textureId != 0)
-                deleteTextureID();
-            getGLTextureID();
-            qDebug() << "qtvideo-node: got texture_id: " << m_textureId;
-        }
     } else if (frame.availableMetaData().contains("GLConsumer")) {
         qDebug() << "** Setting GLConsumer instance";
         m_glConsumer = reinterpret_cast<GLConsumerWrapperHybris>(
@@ -95,18 +86,10 @@ void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
 
         // Signal AalMediaPlayerService that glConsumer has been set
         Q_EMIT SharedSignal::instance()->glConsumerSet();
-        return;
-    } else if (!frame.availableMetaData().contains("CamControl") &&
-               !frame.availableMetaData().contains("GetTextureId") &&
-               !frame.availableMetaData().contains("GLConsumer")) {
-        qWarning() << "No camera control, glConsumer instance, or texture id request included in video frame";
-        m_material->setCamControl(0);
-        m_material->setTextureId(0);
-        return;
     }
 
     if (frame.handle().toUInt() == 0) {
-        // Client requests a new texture
+        // Client requests a new texture id
         if (m_textureId != 0)
             deleteTextureID();
         getGLTextureID();

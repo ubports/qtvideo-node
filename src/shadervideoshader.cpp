@@ -29,18 +29,16 @@ void ShaderVideoShader::updateState(const RenderState &state,
 {
     Q_UNUSED(oldMaterial);
     ShaderVideoMaterial *mat = dynamic_cast<ShaderVideoMaterial *>(newMaterial);
-    program()->setUniformValue(m_id_Texture, 0);
+    program()->setUniformValue(m_id_texture, 0);
+
+    if (mat->updateTexture())
+        program()->setUniformValueArray(m_id_matrix, mat->m_textureMatrix, 16, 1);
+
+    if (state.isOpacityDirty())
+        program()->setUniformValue(m_id_opacity, state.opacity());
 
     if (state.isMatrixDirty())
         program()->setUniformValue(m_id_matrix, state.combinedMatrix());
-
-    mat->bind();
-
-//    if (state.isOpacityDirty()) {
-//        mat->m_opacity = state.opacity();
-//        mat->updateBlending();
-//        program()->setUniformValue(m_id_opacity, GLfloat(mat->m_opacity));
-//    }
 }
 
 char const *const *ShaderVideoShader::attributeNames() const
@@ -85,7 +83,7 @@ const char *ShaderVideoShader::fragmentShader() const
 void ShaderVideoShader::initialize()
 {
     m_id_matrix = program()->uniformLocation("qt_Matrix");
-    m_id_Texture = program()->uniformLocation("sTexture");
+    m_id_texture = program()->uniformLocation("sTexture");
     m_id_opacity = program()->uniformLocation("opacity");
     m_tex_matrix = program()->uniformLocation("s_tex_Matrix");
 }

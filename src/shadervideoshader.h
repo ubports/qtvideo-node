@@ -43,7 +43,7 @@ protected:
     void initialize();
 
     int m_id_matrix;
-    int m_id_Texture;
+    int m_id_texture;
     int m_id_opacity;
     QVideoFrame::PixelFormat m_pixelFormat;
 };
