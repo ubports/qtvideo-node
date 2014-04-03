@@ -84,6 +84,11 @@ void ShaderVideoMaterial::setGLConsumer(GLConsumerWrapperHybris gl_consumer)
     m_glConsumer = gl_consumer;
 }
 
+GLConsumerWrapperHybris ShaderVideoMaterial::glConsumer() const
+{
+    return m_glConsumer;
+}
+
 bool ShaderVideoMaterial::updateTexture()
 {
     bool textureDirty = false;

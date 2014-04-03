@@ -50,6 +50,7 @@ public:
 
     void setSurfaceTextureClient(SurfaceTextureClientHybris surface_texture_client);
     void setGLConsumer(GLConsumerWrapperHybris gl_consumer);
+    GLConsumerWrapperHybris glConsumer() const;
 
     bool updateTexture();
 

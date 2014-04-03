@@ -7,7 +7,7 @@ target.CONFIG += no_default_install
 
 include(../../coverage.pri)
 
-QT += testlib multimedia opengl quick-private
+QT += testlib multimedia opengl quick
 
 # This is to avoid a segfault in shadervideonode.cpp when it tries to call
 # glGenTextures(), since the platform currently does not support real OpenGL
@@ -30,7 +30,6 @@ HEADERS += .  ../../src/shadervideomaterial.h \
     ../../src/private/qtmultimediaquickdefs_p.h \
     ../../src/private/qsgvideonode_p.h \
     camera_compatibility_layer.h \
-    media_compatibility_layer.h \
     surface_texture_client_hybris.h
 
 INCLUDEPATH += ../../src /usr/include/hybris/camera /usr/include/hybris/media /usr/include/libqtubuntu-media-signals
