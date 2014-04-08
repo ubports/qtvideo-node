@@ -116,7 +116,7 @@ void tst_ShaderVideoNode::testGLConsumerSetCurrentFrame()
 
     GLConsumerWrapperHybris *gl_consumer = new GLConsumerWrapperHybris;
 
-    frame.setMetaData("GLConsumer", QVariant::fromValue(reinterpret_cast<unsigned int>(gl_consumer)));
+    frame.setMetaData("GLConsumer", QVariant::fromValue(reinterpret_cast<uint64_t>(gl_consumer)));
     node.setCurrentFrame(frame);
     QCOMPARE(QVariant(QMetaType::VoidStar, node.m_material->glConsumer()),
              QVariant(QMetaType::VoidStar, gl_consumer));
