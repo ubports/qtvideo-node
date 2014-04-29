@@ -1,3 +1,13 @@
+qtvideo-node (0.2.1+14.10.20140429-0ubuntu1) utopic; urgency=low
+
+  [ Jim Hodapp ]
+  * Cleanup code for media-hub and merge with Qt5.2 upstream changes.
+    Pass in a GLConsumer instance to update the rendered frame on. Add
+    frame available listener callback. Add functionality to return a new
+    texture-id when sent a blank frame with "GetTextureId" metadata. .
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 29 Apr 2014 13:55:30 +0000
+
 qtvideo-node (0.2.1+14.04.20140304-0ubuntu2) trusty; urgency=medium
 
   * No-change rebuild for shlib changes in qtbase and qtdeclarative.
