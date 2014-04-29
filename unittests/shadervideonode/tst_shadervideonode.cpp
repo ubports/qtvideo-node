@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical, Ltd.
+ * Copyright (C) 2013-2014 Canonical, Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -22,18 +22,28 @@
 
 #include <shadervideomaterial.h>
 
+#include <qtubuntu_media_signals.h>
+
 #include "camera_compatibility_layer.h"
 #include "surface_texture_client_hybris.h"
 
 #define private public
+
 #include "shadervideonode.h"
 
 class tst_ShaderVideoNode : public QObject
 {
     Q_OBJECT
 private slots:
+    void initTestCase();
+    void cleanupTestCase();
+
     void testCameraSetCurrentFrame();
-    void testTextureIdSetCurrentFrame();
+    void testGLConsumerSetCurrentFrame();
+    void onGLConsumerSet();
+
+private:
+    bool m_glConsumerSet;
 };
 
 class GLTextureBuffer : public QAbstractVideoBuffer
@@ -66,6 +76,15 @@ private:
     unsigned int m_textureId;
 };
 
+void tst_ShaderVideoNode::initTestCase()
+{
+    m_glConsumerSet = false;
+}
+
+void tst_ShaderVideoNode::cleanupTestCase()
+{
+}
+
 void tst_ShaderVideoNode::testCameraSetCurrentFrame()
 {
     QVideoSurfaceFormat format;
@@ -78,28 +97,39 @@ void tst_ShaderVideoNode::testCameraSetCurrentFrame()
     QCOMPARE(QVariant(QMetaType::VoidStar, node.m_material->cameraControl()),
              QVariant(QMetaType::VoidStar, 0));
 
-    frame.setMetaData("CamControl", QVariant::fromValue((void*)cc));
+    frame.setMetaData("CamControl", QVariant::fromValue(static_cast<void*>(cc)));
     node.setCurrentFrame(frame);
     QCOMPARE(QVariant(QMetaType::VoidStar, node.m_material->cameraControl()),
              QVariant(QMetaType::VoidStar, cc));
 }
 
-void tst_ShaderVideoNode::testTextureIdSetCurrentFrame()
+void tst_ShaderVideoNode::testGLConsumerSetCurrentFrame()
 {
     QVideoSurfaceFormat format;
     ShaderVideoNode node(format);
 
+    connect(SharedSignal::instance(), SIGNAL(glConsumerSet()), this, SLOT(onGLConsumerSet()));
+
     QVideoFrame frame(new GLTextureBuffer(1), QSize(1920, 80), QVideoFrame::Format_RGB32);
 
     node.setCurrentFrame(frame);
-    QCOMPARE(node.m_material->textureId(), (const GLuint)0);
 
-    frame.setMetaData("TextureId", 70001);
-    frame.setMetaData("SurfaceTextureClient", 0x1);
+    GLConsumerWrapperHybris *gl_consumer = new GLConsumerWrapperHybris;
+
+    frame.setMetaData("GLConsumer", QVariant::fromValue(reinterpret_cast<uint64_t>(gl_consumer)));
     node.setCurrentFrame(frame);
-    QCOMPARE(node.m_material->textureId(), (const GLuint)70001);
+    QCOMPARE(QVariant(QMetaType::VoidStar, node.m_material->glConsumer()),
+             QVariant(QMetaType::VoidStar, gl_consumer));
+
+    QVERIFY(m_glConsumerSet == true);
 }
 
-QTEST_MAIN(tst_ShaderVideoNode)
+void tst_ShaderVideoNode::onGLConsumerSet()
+{
+    qDebug() << Q_FUNC_INFO;
+    m_glConsumerSet = true;
+}
+
+QTEST_GUILESS_MAIN(tst_ShaderVideoNode)
 
 #include "tst_shadervideonode.moc"

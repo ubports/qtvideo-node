@@ -35,9 +35,11 @@ ShaderVideoShader *ShaderVideoMaterial::m_videoShader = 0;
 
 ShaderVideoMaterial::ShaderVideoMaterial(const QVideoSurfaceFormat &format)
     : m_format(format),
-    m_camControl(0),
-    m_textureId(0),
-    m_surfaceTextureClient(0)
+      m_camControl(0),
+      m_textureId(0),
+      m_surfaceTextureClient(0),
+      m_glConsumer(0),
+      m_readyToRender(false)
 {
 }
 
@@ -77,19 +79,34 @@ void ShaderVideoMaterial::setSurfaceTextureClient(SurfaceTextureClientHybris sur
     m_surfaceTextureClient = surface_texture_client;
 }
 
-void ShaderVideoMaterial::bind()
+void ShaderVideoMaterial::setGLConsumer(GLConsumerWrapperHybris gl_consumer)
 {
-    if (!m_camControl && !m_textureId) {
-        return;
+    m_glConsumer = gl_consumer;
+}
+
+GLConsumerWrapperHybris ShaderVideoMaterial::glConsumer() const
+{
+    return m_glConsumer;
+}
+
+bool ShaderVideoMaterial::updateTexture()
+{
+    bool textureDirty = false;
+
+    if (!m_camControl && !m_textureId && !m_glConsumer) {
+        return false;
     }
 
     if (m_camControl != NULL) {
         android_camera_update_preview_texture(m_camControl);
         android_camera_get_preview_texture_transformation(m_camControl, m_textureMatrix);
-    }
-    else {
-        surface_texture_client_update_texture(m_surfaceTextureClient);
-        surface_texture_client_get_transformation_matrix(m_surfaceTextureClient, static_cast<float*>(m_textureMatrix));
+        textureDirty = true;
+    } else if (m_glConsumer != NULL && !m_readyToRender) {
+        m_readyToRender = true;
+    } else if (m_glConsumer != NULL && m_readyToRender) {
+        gl_consumer_update_texture(m_glConsumer);
+        gl_consumer_get_transformation_matrix(m_glConsumer, static_cast<float*>(m_textureMatrix));
+        textureDirty = true;
     }
 
     undoAndroidYFlip(m_textureMatrix);
@@ -99,6 +116,8 @@ void ShaderVideoMaterial::bind()
     glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    return textureDirty;
 }
 
 void ShaderVideoMaterial::undoAndroidYFlip(GLfloat matrix[])

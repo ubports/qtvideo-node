@@ -34,6 +34,7 @@ class ShaderVideoMaterial : public QSGMaterial
 {
 public:
     typedef void* SurfaceTextureClientHybris;
+    typedef void* GLConsumerWrapperHybris;
 
     ShaderVideoMaterial(const QVideoSurfaceFormat &format);
 
@@ -48,8 +49,12 @@ public:
     GLuint textureId() const { return m_textureId; }
 
     void setSurfaceTextureClient(SurfaceTextureClientHybris surface_texture_client);
+    void setGLConsumer(GLConsumerWrapperHybris gl_consumer);
+    GLConsumerWrapperHybris glConsumer() const;
 
-    void bind();
+    bool updateTexture();
+
+    GLfloat m_textureMatrix[16];
 
 private:
     void undoAndroidYFlip(GLfloat matrix[]);
@@ -59,8 +64,9 @@ private:
     CameraControl *m_camControl;
     GLuint m_textureId;
     SurfaceTextureClientHybris m_surfaceTextureClient;
+    GLConsumerWrapperHybris m_glConsumer;
+    bool m_readyToRender;
     static ShaderVideoShader *m_videoShader; // the shader is cached in the Qt scene graph
-    GLfloat m_textureMatrix[16];
 };
 
 #endif // SHADERVIDEOMATERIAL_H

@@ -20,6 +20,7 @@
 
 #include <camera_compatibility_layer.h>
 #include <qtubuntu_media_signals.h>
+#include <surface_texture_client_hybris.h>
 
 /*!
  * \brief ShaderVideoNode::ShaderVideoNode
@@ -28,7 +29,7 @@
 ShaderVideoNode::ShaderVideoNode(const QVideoSurfaceFormat &format) :
     m_format(format),
     m_textureId(0),
-    m_surfaceTextureClient(0)
+    m_glConsumer(0)
 {
     m_material = new ShaderVideoMaterial(format);
     setMaterial(m_material);
@@ -72,32 +73,22 @@ void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
             return;
         }
         m_material->setCamControl((CameraControl*)ci);
-    } else if (frame.availableMetaData().contains("TextureId") &&
-               frame.availableMetaData().contains("SurfaceTextureClient")) {
-        m_textureId = frame.metaData("TextureId").value<GLuint>();
-        if (m_textureId == 0) {
-            qWarning() << "No valid textureId in video frame";
+    } else if (frame.availableMetaData().contains("GLConsumer")) {
+        qDebug() << "** Setting GLConsumer instance";
+        m_glConsumer = reinterpret_cast<GLConsumerWrapperHybris>(
+            frame.metaData("GLConsumer").value<unsigned int>());
+        m_material->setGLConsumer(m_glConsumer);
+        if (m_glConsumer == 0) {
+            qWarning() << "No valid GLConsumerWrapperHybris instance in video frame";
             return;
         }
-        m_material->setTextureId(m_textureId);
 
-        m_surfaceTextureClient = reinterpret_cast<SurfaceTextureClientHybris>
-            (frame.metaData("SurfaceTextureClient").value<unsigned int>());
-        if (m_surfaceTextureClient == 0) {
-            qWarning() << "No valid SurfaceTextureClient instance in video frame";
-            return;
-        }
-        m_material->setSurfaceTextureClient(m_surfaceTextureClient);
-    } else if (!frame.availableMetaData().contains("CamControl") &&
-               !frame.availableMetaData().contains("TextureId")) {
-        qWarning() << "No camera control or texture id instance included in video frame";
-        m_material->setCamControl(0);
-        m_material->setTextureId(0);
-        return;
+        // Signal AalMediaPlayerService that glConsumer has been set
+        Q_EMIT SharedSignal::instance()->glConsumerSet();
     }
 
     if (frame.handle().toUInt() == 0) {
-        // Client requests a new texture
+        // Client requests a new texture id
         if (m_textureId != 0)
             deleteTextureID();
         getGLTextureID();
@@ -105,7 +96,7 @@ void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
         m_material->setCamControl(0);
     } else {
         // Draw the frame
-        markDirty(DirtyMaterial);
+        markDirty(QSGNode::DirtyMaterial);
     }
 }
 
