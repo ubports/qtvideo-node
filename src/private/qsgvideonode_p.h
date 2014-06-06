@@ -76,7 +76,7 @@ public:
     virtual QSGVideoNode *createNode(const QVideoSurfaceFormat &format) = 0;
 };
 
-#define QSGVideoNodeFactoryInterface_iid "org.qt-project.qt.sgvideonodefactory/5.0"
+#define QSGVideoNodeFactoryInterface_iid "org.qt-project.qt.sgvideonodefactory/5.2"
 Q_DECLARE_INTERFACE(QSGVideoNodeFactoryInterface, QSGVideoNodeFactoryInterface_iid)
 
 class Q_MULTIMEDIAQUICK_EXPORT QSGVideoNodeFactoryPlugin : public QObject, public QSGVideoNodeFactoryInterface

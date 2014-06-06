@@ -24,7 +24,7 @@ class ShaderVideoNodePlugin : public QObject, public QSGVideoNodeFactoryInterfac
 {
     Q_OBJECT
     Q_INTERFACES(QSGVideoNodeFactoryInterface)
-    Q_PLUGIN_METADATA(IID "org.qt-project.qt.sgvideonodefactory/5.0" FILE "shadervideonode.json")
+    Q_PLUGIN_METADATA(IID "org.qt-project.qt.sgvideonodefactory/5.2" FILE "shadervideonode.json")
 
 public:
     QList<QVideoFrame::PixelFormat> supportedPixelFormats(QAbstractVideoBuffer::HandleType handleType) const;

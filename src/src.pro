@@ -1,11 +1,13 @@
 TARGET = shadervideonode
 TEMPLATE = lib
 CONFIG += plugin
-QT += multimedia opengl quick-private
+QT += multimedia opengl quick-private quick
 
 include(../coverage.pri)
 
 PLUGIN_TYPE = video/videonode
+PLUGIN_EXTENDS = quick
+PLUGIN_CLASS_NAME = ShaderVideoNodePlugin
 
 target.path += $$[QT_INSTALL_PLUGINS]/$${PLUGIN_TYPE}
 INSTALLS = target
