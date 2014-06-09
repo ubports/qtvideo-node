@@ -1,3 +1,13 @@
+qtvideo-node (0.2.1+14.10.20140609-0ubuntu1) utopic; urgency=low
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+  [ Ricardo Mendoza ]
+  * Adapt for Qt 5.3 plugin framework
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 09 Jun 2014 07:13:01 +0000
+
 qtvideo-node (0.2.1+14.10.20140429-0ubuntu1) utopic; urgency=low
 
   [ Jim Hodapp ]
