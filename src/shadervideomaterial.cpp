@@ -22,6 +22,9 @@
 #endif
 
 #include <QGLShaderProgram>
+#include <QtOpenGL>
+#include <QMatrix4x4>
+#include <QTransform>
 
 #include <QtCore/qdebug.h>
 
@@ -41,6 +44,55 @@ ShaderVideoMaterial::ShaderVideoMaterial(const QVideoSurfaceFormat &format)
       m_glConsumer(0),
       m_readyToRender(false)
 {
+    // Initialize m_textureMatrix
+    for (uint8_t i=0; i < 16; i++)
+        m_textureMatrix[i] = 0;
+
+#if 0
+    // FIXME: Temporary hack (android * container)
+    m_textureMatrix[0] = 0;
+    m_textureMatrix[1] = 1;
+    m_textureMatrix[2] = 0;
+    m_textureMatrix[3] = 0;
+
+    m_textureMatrix[4] = 1;
+    m_textureMatrix[5] = 0;
+    m_textureMatrix[6] = 0;
+    m_textureMatrix[7] = 0;
+
+    m_textureMatrix[8] = 0;
+    m_textureMatrix[9] = 0;
+    m_textureMatrix[10] = 1;
+    m_textureMatrix[11] = 0;
+
+    m_textureMatrix[12] = 0;
+    m_textureMatrix[13] = 1;
+    m_textureMatrix[14] = 0;
+    m_textureMatrix[15] = 1;
+#endif
+
+#if 1
+    // FIXME: Temporary hack (android * container * scaling)
+    m_textureMatrix[0] = 0;
+    m_textureMatrix[1] = 1;
+    m_textureMatrix[2] = 0;
+    m_textureMatrix[3] = 0;
+
+    m_textureMatrix[4] = 1;
+    m_textureMatrix[5] = 0;
+    m_textureMatrix[6] = 0;
+    m_textureMatrix[7] = 0;
+
+    m_textureMatrix[8] = 0;
+    m_textureMatrix[9] = 0;
+    m_textureMatrix[10] = 1;
+    m_textureMatrix[11] = 0;
+
+    m_textureMatrix[12] = 0;
+    m_textureMatrix[13] = 1;
+    m_textureMatrix[14] = 0;
+    m_textureMatrix[15] = 1;
+#endif
 }
 
 QSGMaterialShader *ShaderVideoMaterial::createShader() const
@@ -105,12 +157,37 @@ bool ShaderVideoMaterial::updateTexture()
         m_readyToRender = true;
     } else if (m_glConsumer != NULL && m_readyToRender) {
         gl_consumer_update_texture(m_glConsumer);
-        gl_consumer_get_transformation_matrix(m_glConsumer, static_cast<float*>(m_textureMatrix));
+        //gl_consumer_get_transformation_matrix(m_glConsumer, static_cast<float*>(m_textureMatrix));
+        //printGLMaxtrix(m_textureMatrix);
         textureDirty = true;
     }
 
-    undoAndroidYFlip(m_textureMatrix);
-    glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_FALSE, m_textureMatrix);
+    Matrix andcont = { 0, 1, 0, 0,
+                       1, 0, 0, 1,
+                       0, 0, 1, 0,
+                       0, 0, 0, 1 };
+
+    Matrix scaling = { 1.25, 0, 0, 0,
+                       0, 1.25, 0, 0,
+                       0, 0, 1, 0,
+                       0, 0, 0, 1 };
+
+    Matrix res;
+    printMaxtrix(andcont.m);
+    qDebug() << " * ";
+    printMaxtrix(scaling.m);
+    multiplyMatrix(&res, &andcont, &scaling);
+    qDebug() << "res: ";
+    printMaxtrix(res.m);
+
+    convertToGLMatrix(m_textureMatrix, &res);
+
+
+    //printGLMaxtrix(m_textureMatrix);
+    //undoAndroidYFlip(m_textureMatrix);
+    qDebug() << "-------------------";
+    //printGLMaxtrix(m_textureMatrix);
+    glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_TRUE, m_textureMatrix);
 
     glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -133,7 +210,7 @@ void ShaderVideoMaterial::undoAndroidYFlip(GLfloat matrix[])
 
 /*!
  * \brief ShaderVideoMaterial::printGLMaxtrix
- * Prints a OpenGL matrix (GLfloat m[16]) to std out.
+ * Prints an EGL matrix (GLfloat m[16]) to std out.
  * This function stays here for convenience in case some more debugging is necessary for the android
  * transformation matrix.
  * \param matrix Matrix to be printed to std out
@@ -144,4 +221,91 @@ void ShaderVideoMaterial::printGLMaxtrix(GLfloat matrix[])
     qDebug() << matrix[1] << matrix[5] << matrix[9] << matrix[13];
     qDebug() << matrix[2] << matrix[6] << matrix[10] << matrix[14];
     qDebug() << matrix[3] << matrix[7] << matrix[11] << matrix[15];
+}
+
+void ShaderVideoMaterial::printMaxtrix(float matrix[])
+{
+    qDebug() << matrix[0] << matrix[1] << matrix[2] << matrix[3];
+    qDebug() << matrix[4] << matrix[5] << matrix[6] << matrix[7];
+    qDebug() << matrix[8] << matrix[9] << matrix[10] << matrix[11];
+    qDebug() << matrix[12] << matrix[13] << matrix[14] << matrix[15];
+}
+
+void ShaderVideoMaterial::vectorSet(ShaderVideoMaterial::Vector *v, float x, float y, float z, float w)
+{
+    v->x = x;
+    v->y = y;
+    v->z = z;
+    v->w = w;
+}
+
+void ShaderVideoMaterial::multiplyMatrix(ShaderVideoMaterial::Matrix* __restrict m, const ShaderVideoMaterial::Matrix* __restrict m1,
+        const ShaderVideoMaterial::Matrix* __restrict m2)
+{
+    vectorSet(&m->v0,
+            m1->m00*m2->m00 + m1->m01*m2->m10 + m1->m02*m2->m20 + m1->m03*m2->m30,
+            m1->m00*m2->m01 + m1->m01*m2->m11 + m1->m02*m2->m21 + m1->m03*m2->m31,
+            m1->m00*m2->m02 + m1->m01*m2->m12 + m1->m02*m2->m22 + m1->m03*m2->m32,
+            m1->m00*m2->m03 + m1->m01*m2->m13 + m1->m02*m2->m23 + m1->m03*m2->m33);
+    vectorSet(&m->v1,
+            m1->m10*m2->m00 + m1->m11*m2->m10 + m1->m12*m2->m20 + m1->m13*m2->m30,
+            m1->m10*m2->m01 + m1->m11*m2->m11 + m1->m12*m2->m21 + m1->m13*m2->m31,
+            m1->m10*m2->m02 + m1->m11*m2->m12 + m1->m12*m2->m22 + m1->m13*m2->m32,
+            m1->m10*m2->m03 + m1->m11*m2->m13 + m1->m12*m2->m23 + m1->m13*m2->m33);
+    vectorSet(&m->v2,
+            m1->m20*m2->m00 + m1->m21*m2->m10 + m1->m22*m2->m20 + m1->m23*m2->m30,
+            m1->m20*m2->m01 + m1->m21*m2->m11 + m1->m22*m2->m21 + m1->m23*m2->m31,
+            m1->m20*m2->m02 + m1->m21*m2->m12 + m1->m22*m2->m22 + m1->m23*m2->m32,
+            m1->m20*m2->m03 + m1->m21*m2->m13 + m1->m22*m2->m23 + m1->m23*m2->m33);
+    vectorSet(&m->v3,
+            m1->m30*m2->m00 + m1->m31*m2->m10 + m1->m32*m2->m20 + m1->m33*m2->m30,
+            m1->m30*m2->m01 + m1->m31*m2->m11 + m1->m32*m2->m21 + m1->m33*m2->m31,
+            m1->m30*m2->m02 + m1->m31*m2->m12 + m1->m32*m2->m22 + m1->m33*m2->m32,
+            m1->m30*m2->m03 + m1->m31*m2->m13 + m1->m32*m2->m23 + m1->m33*m2->m33);
+}
+
+void ShaderVideoMaterial::convertToGLMatrix(GLfloat *m, const Matrix* __restrict m1)
+{
+    if (m == NULL || m1 == NULL)
+        return;
+
+    m[0] = m1->m[0];
+    m[1] = m1->m[4];
+    m[2] = m1->m[8];
+    m[3] = m1->m[12];
+    m[4] = m1->m[1];
+    m[5] = m1->m[5];
+    m[6] = m1->m[9];
+    m[7] = m1->m[13];
+    m[8] = m1->m[2];
+    m[9] = m1->m[6];
+    m[10] = m1->m[10];
+    m[11] = m1->m[14];
+    m[12] = m1->m[3];
+    m[13] = m1->m[7];
+    m[14] = m1->m[11];
+    m[15] = m1->m[15];
+}
+
+void ShaderVideoMaterial::convertToMatrix(Matrix* __restrict m, const GLfloat* m1)
+{
+    if (m == NULL || m1 == NULL)
+        return;
+
+    m->m[0] = m1[0];
+    m->m[1] = m1[4];
+    m->m[2] = m1[8];
+    m->m[3] = m1[12];
+    m->m[4] = m1[1];
+    m->m[5] = m1[5];
+    m->m[6] = m1[9];
+    m->m[7] = m1[13];
+    m->m[8] = m1[2];
+    m->m[9] = m1[6];
+    m->m[10] = m1[10];
+    m->m[11] = m1[14];
+    m->m[12] = m1[3];
+    m->m[13] = m1[7];
+    m->m[14] = m1[11];
+    m->m[15] = m1[15];
 }

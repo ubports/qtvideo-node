@@ -75,7 +75,7 @@ const char *ShaderVideoShader::fragmentShader() const
         "varying highp vec2 qt_TexCoord;                     \n"
         "void main()                                         \n"
         "{                                                   \n"
-        "  gl_FragColor = texture2D( sTexture, qt_TexCoord );\n"
+        "  gl_FragColor = texture2D( sTexture, qt_TexCoord ) * vec4(opacity);\n"
         "}                                                   \n";
     return shader;
 }

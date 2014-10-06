@@ -14,6 +14,7 @@ INSTALLS = target
 
 INCLUDEPATH += /usr/include/hybris/camera /usr/include/hybris/media /usr/include/libqtubuntu-media-signals
 LIBS += -lhybris_ics -lcamera -lmedia -lqtubuntu-media-signals
+//LIBS += -lunwind -lunwind-arm -lunwind-coredump -lunwind-ptrace
 
 OTHER_FILES += shadervideonode.json
 

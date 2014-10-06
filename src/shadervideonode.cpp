@@ -95,6 +95,7 @@ void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
         // Prevent drawing
         m_material->setCamControl(0);
     } else {
+        qDebug() << __PRETTY_FUNCTION__ << ": draw the frame";
         // Draw the frame
         markDirty(QSGNode::DirtyMaterial);
     }
