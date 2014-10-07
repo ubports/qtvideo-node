@@ -162,32 +162,46 @@ bool ShaderVideoMaterial::updateTexture()
         textureDirty = true;
     }
 
+    QMatrix4x4 qandcont(0, 1, 0, 0,
+                        1, 0, 0, 1,
+                        0, 0, 1, 0,
+                        0, 0, 0, 1);
+
     Matrix andcont = { 0, 1, 0, 0,
                        1, 0, 0, 1,
                        0, 0, 1, 0,
                        0, 0, 0, 1 };
 
-    Matrix scaling = { 1.25, 0, 0, 0,
-                       0, 1.25, 0, 0,
+    Matrix scaling = { 0.5625, 0, 0, 0,
+                       0, 1.7778, 0, 0,
                        0, 0, 1, 0,
                        0, 0, 0, 1 };
 
-    Matrix res;
     printMaxtrix(andcont.m);
+
+    const float aspectRatio = 1280.0 / 720.0;
+    qandcont.ortho(-aspectRatio, aspectRatio, -1, 1, -1, 1);
+    //qandcont.scale(0.5625, 1.7778);
+    qDebug() << "aspectRatio: " << aspectRatio;
+    qDebug() << "qandcont: " << qandcont;
+#if 0
     qDebug() << " * ";
     printMaxtrix(scaling.m);
+    Matrix res;
     multiplyMatrix(&res, &andcont, &scaling);
     qDebug() << "res: ";
     printMaxtrix(res.m);
 
     convertToGLMatrix(m_textureMatrix, &res);
+#endif
 
 
     //printGLMaxtrix(m_textureMatrix);
     //undoAndroidYFlip(m_textureMatrix);
     qDebug() << "-------------------";
     //printGLMaxtrix(m_textureMatrix);
-    glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_TRUE, m_textureMatrix);
+    //glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_TRUE, m_textureMatrix);
+    glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_TRUE, qandcont.data());
 
     glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
