@@ -23,7 +23,6 @@
 
 #include <QGLShaderProgram>
 #include <QtOpenGL>
-#include <QMatrix4x4>
 #include <QTransform>
 
 #include <QtCore/qdebug.h>
@@ -32,6 +31,7 @@
 #include "shadervideoshader.h"
 
 #include <camera_compatibility_layer.h>
+#include <qtubuntu_media_signals.h>
 #include <surface_texture_client_hybris.h>
 
 ShaderVideoShader *ShaderVideoMaterial::m_videoShader = 0;
@@ -42,7 +42,8 @@ ShaderVideoMaterial::ShaderVideoMaterial(const QVideoSurfaceFormat &format)
       m_textureId(0),
       m_surfaceTextureClient(0),
       m_glConsumer(0),
-      m_readyToRender(false)
+      m_readyToRender(false),
+      m_orientation(SharedSignal::Orientation::rotate0)
 {
     // Initialize m_textureMatrix
     for (uint8_t i=0; i < 16; i++)
@@ -93,6 +94,9 @@ ShaderVideoMaterial::ShaderVideoMaterial(const QVideoSurfaceFormat &format)
     m_textureMatrix[14] = 0;
     m_textureMatrix[15] = 1;
 #endif
+
+    connect(SharedSignal::instance(), SIGNAL(setOrientation(const SharedSignal::Orientation&, const QSize&)),
+            this, SLOT(onSetOrientation(const SharedSignal::Orientation&, const QSize&)));
 }
 
 QSGMaterialShader *ShaderVideoMaterial::createShader() const
@@ -157,51 +161,23 @@ bool ShaderVideoMaterial::updateTexture()
         m_readyToRender = true;
     } else if (m_glConsumer != NULL && m_readyToRender) {
         gl_consumer_update_texture(m_glConsumer);
-        //gl_consumer_get_transformation_matrix(m_glConsumer, static_cast<float*>(m_textureMatrix));
-        //printGLMaxtrix(m_textureMatrix);
+        gl_consumer_get_transformation_matrix(m_glConsumer, static_cast<float*>(m_textureMatrix));
         textureDirty = true;
     }
 
-    QMatrix4x4 qandcont(0, 1, 0, 0,
-                        1, 0, 0, 1,
-                        0, 0, 1, 0,
-                        0, 0, 0, 1);
-
-    Matrix andcont = { 0, 1, 0, 0,
-                       1, 0, 0, 1,
-                       0, 0, 1, 0,
-                       0, 0, 0, 1 };
-
-    Matrix scaling = { 0.5625, 0, 0, 0,
-                       0, 1.7778, 0, 0,
-                       0, 0, 1, 0,
-                       0, 0, 0, 1 };
-
-    printMaxtrix(andcont.m);
-
-    const float aspectRatio = 1280.0 / 720.0;
-    qandcont.ortho(-aspectRatio, aspectRatio, -1, 1, -1, 1);
-    //qandcont.scale(0.5625, 1.7778);
-    qDebug() << "aspectRatio: " << aspectRatio;
-    qDebug() << "qandcont: " << qandcont;
-#if 0
-    qDebug() << " * ";
-    printMaxtrix(scaling.m);
-    Matrix res;
-    multiplyMatrix(&res, &andcont, &scaling);
-    qDebug() << "res: ";
-    printMaxtrix(res.m);
-
-    convertToGLMatrix(m_textureMatrix, &res);
-#endif
-
-
-    //printGLMaxtrix(m_textureMatrix);
-    //undoAndroidYFlip(m_textureMatrix);
-    qDebug() << "-------------------";
-    //printGLMaxtrix(m_textureMatrix);
-    //glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_TRUE, m_textureMatrix);
-    glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_TRUE, qandcont.data());
+    // See if the video needs rotation
+    if (m_orientation == SharedSignal::Orientation::rotate90)
+    {
+        QMatrix4x4 qRotated = rotateAndOrtho(m_textureMatrix, m_orientation);
+        qDebug() << "Rotating output video 90 degrees";
+        glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_TRUE, qRotated.data());
+    }
+    else
+    {
+        qDebug() << "Not rotating output video";
+        undoAndroidYFlip(m_textureMatrix);
+        glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_FALSE, m_textureMatrix);
+    }
 
     glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -209,6 +185,57 @@ bool ShaderVideoMaterial::updateTexture()
     glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     return textureDirty;
+}
+
+void ShaderVideoMaterial::onSetOrientation(const SharedSignal::Orientation& orientation,
+        const QSize &size)
+{
+    m_orientation = orientation;
+    m_frameSize = size;
+}
+
+// Takes a GLfloat texture matrix and desired orientation, and outputs a rotated and ortho
+// projected matrix.
+QMatrix4x4 ShaderVideoMaterial::rotateAndOrtho(GLfloat *m, const SharedSignal::Orientation &orientation)
+{
+    QMatrix4x4 ret(m[0], m[4], m[8], m[12],
+                   m[1], m[5], m[9], m[13],
+                   m[2], m[6], m[10], m[14],
+                   m[3], m[7], m[11], m[15]);
+
+    if (m == NULL)
+        return ret;
+
+    switch (orientation)
+    {
+        case SharedSignal::Orientation::rotate90:
+        {
+            // FIXME: This matrix comes from the file container, but could not
+            // get this actual matrix up from GStreamer to here, so hardcoded
+            // for now.
+            const QMatrix4x4 qRotate90(0, 1, 0, 0,
+                                      -1, 0, 0, 0,
+                                       0, 0, 1, 0,
+                                       0, 0, 0, 1);
+            QMatrix4x4 qRowMajorTextureMatrix(m[0], m[4], m[8], m[12],
+                                              m[1], m[5], m[9], m[13],
+                                              m[2], m[6], m[10], m[14],
+                                              m[3], m[7], m[11], m[15]);
+
+            ret = qRowMajorTextureMatrix * qRotate90;
+            const float aspectRatio = static_cast<float>(m_frameSize.width()) / static_cast<float>(m_frameSize.height());
+            ret.ortho(-aspectRatio, aspectRatio, -1, 1, -1, 1);
+            qDebug() << "aspectRatio: " << aspectRatio;
+        }
+        break;
+        case SharedSignal::Orientation::rotate0:
+        case SharedSignal::Orientation::rotate180:
+        case SharedSignal::Orientation::rotate270:
+        default:
+            break;
+    }
+
+    return ret;
 }
 
 void ShaderVideoMaterial::undoAndroidYFlip(GLfloat matrix[])
@@ -243,83 +270,4 @@ void ShaderVideoMaterial::printMaxtrix(float matrix[])
     qDebug() << matrix[4] << matrix[5] << matrix[6] << matrix[7];
     qDebug() << matrix[8] << matrix[9] << matrix[10] << matrix[11];
     qDebug() << matrix[12] << matrix[13] << matrix[14] << matrix[15];
-}
-
-void ShaderVideoMaterial::vectorSet(ShaderVideoMaterial::Vector *v, float x, float y, float z, float w)
-{
-    v->x = x;
-    v->y = y;
-    v->z = z;
-    v->w = w;
-}
-
-void ShaderVideoMaterial::multiplyMatrix(ShaderVideoMaterial::Matrix* __restrict m, const ShaderVideoMaterial::Matrix* __restrict m1,
-        const ShaderVideoMaterial::Matrix* __restrict m2)
-{
-    vectorSet(&m->v0,
-            m1->m00*m2->m00 + m1->m01*m2->m10 + m1->m02*m2->m20 + m1->m03*m2->m30,
-            m1->m00*m2->m01 + m1->m01*m2->m11 + m1->m02*m2->m21 + m1->m03*m2->m31,
-            m1->m00*m2->m02 + m1->m01*m2->m12 + m1->m02*m2->m22 + m1->m03*m2->m32,
-            m1->m00*m2->m03 + m1->m01*m2->m13 + m1->m02*m2->m23 + m1->m03*m2->m33);
-    vectorSet(&m->v1,
-            m1->m10*m2->m00 + m1->m11*m2->m10 + m1->m12*m2->m20 + m1->m13*m2->m30,
-            m1->m10*m2->m01 + m1->m11*m2->m11 + m1->m12*m2->m21 + m1->m13*m2->m31,
-            m1->m10*m2->m02 + m1->m11*m2->m12 + m1->m12*m2->m22 + m1->m13*m2->m32,
-            m1->m10*m2->m03 + m1->m11*m2->m13 + m1->m12*m2->m23 + m1->m13*m2->m33);
-    vectorSet(&m->v2,
-            m1->m20*m2->m00 + m1->m21*m2->m10 + m1->m22*m2->m20 + m1->m23*m2->m30,
-            m1->m20*m2->m01 + m1->m21*m2->m11 + m1->m22*m2->m21 + m1->m23*m2->m31,
-            m1->m20*m2->m02 + m1->m21*m2->m12 + m1->m22*m2->m22 + m1->m23*m2->m32,
-            m1->m20*m2->m03 + m1->m21*m2->m13 + m1->m22*m2->m23 + m1->m23*m2->m33);
-    vectorSet(&m->v3,
-            m1->m30*m2->m00 + m1->m31*m2->m10 + m1->m32*m2->m20 + m1->m33*m2->m30,
-            m1->m30*m2->m01 + m1->m31*m2->m11 + m1->m32*m2->m21 + m1->m33*m2->m31,
-            m1->m30*m2->m02 + m1->m31*m2->m12 + m1->m32*m2->m22 + m1->m33*m2->m32,
-            m1->m30*m2->m03 + m1->m31*m2->m13 + m1->m32*m2->m23 + m1->m33*m2->m33);
-}
-
-void ShaderVideoMaterial::convertToGLMatrix(GLfloat *m, const Matrix* __restrict m1)
-{
-    if (m == NULL || m1 == NULL)
-        return;
-
-    m[0] = m1->m[0];
-    m[1] = m1->m[4];
-    m[2] = m1->m[8];
-    m[3] = m1->m[12];
-    m[4] = m1->m[1];
-    m[5] = m1->m[5];
-    m[6] = m1->m[9];
-    m[7] = m1->m[13];
-    m[8] = m1->m[2];
-    m[9] = m1->m[6];
-    m[10] = m1->m[10];
-    m[11] = m1->m[14];
-    m[12] = m1->m[3];
-    m[13] = m1->m[7];
-    m[14] = m1->m[11];
-    m[15] = m1->m[15];
-}
-
-void ShaderVideoMaterial::convertToMatrix(Matrix* __restrict m, const GLfloat* m1)
-{
-    if (m == NULL || m1 == NULL)
-        return;
-
-    m->m[0] = m1[0];
-    m->m[1] = m1[4];
-    m->m[2] = m1[8];
-    m->m[3] = m1[12];
-    m->m[4] = m1[1];
-    m->m[5] = m1[5];
-    m->m[6] = m1[9];
-    m->m[7] = m1[13];
-    m->m[8] = m1[2];
-    m->m[9] = m1[6];
-    m->m[10] = m1[10];
-    m->m[11] = m1[14];
-    m->m[12] = m1[3];
-    m->m[13] = m1[7];
-    m->m[14] = m1[11];
-    m->m[15] = m1[15];
 }

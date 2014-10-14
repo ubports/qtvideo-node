@@ -23,15 +23,19 @@
 #else
 #include <QtQuick/QSGMaterial>
 #endif
-#include <QVideoSurfaceFormat>
 #include <qgl.h>
+#include <QMatrix4x4>
+#include <QObject>
+#include <QVideoSurfaceFormat>
+#include <qtubuntu_media_signals.h>
 
 struct CameraControl;
 struct MediaPlayerWrapper;
 class ShaderVideoShader;
 
-class ShaderVideoMaterial : public QSGMaterial
+class ShaderVideoMaterial : public QObject, public QSGMaterial
 {
+    Q_OBJECT
 public:
     typedef void* SurfaceTextureClientHybris;
     typedef void* GLConsumerWrapperHybris;
@@ -56,43 +60,14 @@ public:
 
     GLfloat m_textureMatrix[16];
 
+private Q_SLOTS:
+    void onSetOrientation(const SharedSignal::Orientation& orientation, const QSize &size);
+
 private:
-    // 4-component vector
-    typedef struct {
-        union {
-            struct { float x, y, z, w; };
-            float v[4];
-        };
-    } Vector;
-
-    // 4x4 matrix
-    typedef struct {
-        union {
-            struct {
-                float m00, m01, m02, m03;
-                float m10, m11, m12, m13;
-                float m20, m21, m22, m23;
-                float m30, m31, m32, m33;
-            };
-            float m[16];
-            struct { Vector v0, v1, v2, v3; };
-            Vector v[4];
-        };
-    } Matrix;
-
+    QMatrix4x4 rotateAndOrtho(GLfloat *m, const SharedSignal::Orientation &orientation);
     void undoAndroidYFlip(GLfloat matrix[]);
     void printGLMaxtrix(GLfloat matrix[]);
     void printMaxtrix(float matrix[]);
-
-    // Vector initialization.
-    void vectorSet(Vector *v, float x, float y, float z, float w);
-    // Multiply two matrices together. The result is stored in |m|
-    void multiplyMatrix(Matrix* __restrict m, const Matrix* __restrict m1,
-            const Matrix* __restrict m2);
-    // Converts the ordering of a local Matrix to a GLfloat matrix
-    void convertToGLMatrix(GLfloat *m, const Matrix* __restrict m1);
-    // Converts the ordering of a GLfloat matrix to a local Matrix
-    void convertToMatrix(Matrix* __restrict m, const GLfloat* m1);
 
     QVideoSurfaceFormat m_format;
     CameraControl *m_camControl;
@@ -101,6 +76,8 @@ private:
     GLConsumerWrapperHybris m_glConsumer;
     bool m_readyToRender;
     static ShaderVideoShader *m_videoShader; // the shader is cached in the Qt scene graph
+    SharedSignal::Orientation m_orientation;
+    QSize m_frameSize;
 };
 
 #endif // SHADERVIDEOMATERIAL_H

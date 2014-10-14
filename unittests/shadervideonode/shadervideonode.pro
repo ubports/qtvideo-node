@@ -1,5 +1,5 @@
 CONFIG += testcase
-CONFIG += no_private_qt_headers_warning
+CONFIG += no_private_qt_headers_warning c++11
 TARGET = tst_shadervideonode
 
 # We don't want to install unit tests anywhere as it doesn't make sense
