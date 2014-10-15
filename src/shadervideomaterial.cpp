@@ -45,56 +45,6 @@ ShaderVideoMaterial::ShaderVideoMaterial(const QVideoSurfaceFormat &format)
       m_readyToRender(false),
       m_orientation(SharedSignal::Orientation::rotate0)
 {
-    // Initialize m_textureMatrix
-    for (uint8_t i=0; i < 16; i++)
-        m_textureMatrix[i] = 0;
-
-#if 0
-    // FIXME: Temporary hack (android * container)
-    m_textureMatrix[0] = 0;
-    m_textureMatrix[1] = 1;
-    m_textureMatrix[2] = 0;
-    m_textureMatrix[3] = 0;
-
-    m_textureMatrix[4] = 1;
-    m_textureMatrix[5] = 0;
-    m_textureMatrix[6] = 0;
-    m_textureMatrix[7] = 0;
-
-    m_textureMatrix[8] = 0;
-    m_textureMatrix[9] = 0;
-    m_textureMatrix[10] = 1;
-    m_textureMatrix[11] = 0;
-
-    m_textureMatrix[12] = 0;
-    m_textureMatrix[13] = 1;
-    m_textureMatrix[14] = 0;
-    m_textureMatrix[15] = 1;
-#endif
-
-#if 1
-    // FIXME: Temporary hack (android * container * scaling)
-    m_textureMatrix[0] = 0;
-    m_textureMatrix[1] = 1;
-    m_textureMatrix[2] = 0;
-    m_textureMatrix[3] = 0;
-
-    m_textureMatrix[4] = 1;
-    m_textureMatrix[5] = 0;
-    m_textureMatrix[6] = 0;
-    m_textureMatrix[7] = 0;
-
-    m_textureMatrix[8] = 0;
-    m_textureMatrix[9] = 0;
-    m_textureMatrix[10] = 1;
-    m_textureMatrix[11] = 0;
-
-    m_textureMatrix[12] = 0;
-    m_textureMatrix[13] = 1;
-    m_textureMatrix[14] = 0;
-    m_textureMatrix[15] = 1;
-#endif
-
     connect(SharedSignal::instance(), SIGNAL(setOrientation(const SharedSignal::Orientation&, const QSize&)),
             this, SLOT(onSetOrientation(const SharedSignal::Orientation&, const QSize&)));
 }
@@ -169,12 +119,11 @@ bool ShaderVideoMaterial::updateTexture()
     if (m_orientation == SharedSignal::Orientation::rotate90)
     {
         QMatrix4x4 qRotated = rotateAndOrtho(m_textureMatrix, m_orientation);
-        qDebug() << "Rotating output video 90 degrees";
-        glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_TRUE, qRotated.data());
+        //printGLMaxtrix(qRotated.data());
+        glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_FALSE, qRotated.data());
     }
     else
     {
-        qDebug() << "Not rotating output video";
         undoAndroidYFlip(m_textureMatrix);
         glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_FALSE, m_textureMatrix);
     }
@@ -192,16 +141,15 @@ void ShaderVideoMaterial::onSetOrientation(const SharedSignal::Orientation& orie
 {
     m_orientation = orientation;
     m_frameSize = size;
+    qDebug() << "orientation: " << orientation;
+    qDebug() << "frameSize: " << size;
 }
 
 // Takes a GLfloat texture matrix and desired orientation, and outputs a rotated and ortho
 // projected matrix.
 QMatrix4x4 ShaderVideoMaterial::rotateAndOrtho(GLfloat *m, const SharedSignal::Orientation &orientation)
 {
-    QMatrix4x4 ret(m[0], m[4], m[8], m[12],
-                   m[1], m[5], m[9], m[13],
-                   m[2], m[6], m[10], m[14],
-                   m[3], m[7], m[11], m[15]);
+    QMatrix4x4 ret;
 
     if (m == NULL)
         return ret;
@@ -217,6 +165,7 @@ QMatrix4x4 ShaderVideoMaterial::rotateAndOrtho(GLfloat *m, const SharedSignal::O
                                       -1, 0, 0, 0,
                                        0, 0, 1, 0,
                                        0, 0, 0, 1);
+
             QMatrix4x4 qRowMajorTextureMatrix(m[0], m[4], m[8], m[12],
                                               m[1], m[5], m[9], m[13],
                                               m[2], m[6], m[10], m[14],
@@ -224,8 +173,11 @@ QMatrix4x4 ShaderVideoMaterial::rotateAndOrtho(GLfloat *m, const SharedSignal::O
 
             ret = qRowMajorTextureMatrix * qRotate90;
             const float aspectRatio = static_cast<float>(m_frameSize.width()) / static_cast<float>(m_frameSize.height());
+            //qDebug() << "aspectRatio: " << aspectRatio;
             ret.ortho(-aspectRatio, aspectRatio, -1, 1, -1, 1);
-            qDebug() << "aspectRatio: " << aspectRatio;
+            // This must be done manually since OpenGLES 2.0 does not support doing the transpose
+            // when uploading the matrix to the GPU. OpenGLES 3.0 supports this.
+            ret = ret.transposed();
         }
         break;
         case SharedSignal::Orientation::rotate0:
@@ -251,7 +203,7 @@ void ShaderVideoMaterial::undoAndroidYFlip(GLfloat matrix[])
 
 /*!
  * \brief ShaderVideoMaterial::printGLMaxtrix
- * Prints an EGL matrix (GLfloat m[16]) to std out.
+ * Prints an EGL matrix (GLfloat m[16]) to stdout.
  * This function stays here for convenience in case some more debugging is necessary for the android
  * transformation matrix.
  * \param matrix Matrix to be printed to std out
@@ -264,6 +216,10 @@ void ShaderVideoMaterial::printGLMaxtrix(GLfloat matrix[])
     qDebug() << matrix[3] << matrix[7] << matrix[11] << matrix[15];
 }
 
+/*!
+ * \brief Prints a row-major matrix to stdout.
+ * \param matrix Matrix to be printed to std out
+ */
 void ShaderVideoMaterial::printMaxtrix(float matrix[])
 {
     qDebug() << matrix[0] << matrix[1] << matrix[2] << matrix[3];
