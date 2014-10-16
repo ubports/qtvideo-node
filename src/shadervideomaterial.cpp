@@ -118,8 +118,7 @@ bool ShaderVideoMaterial::updateTexture()
     // See if the video needs rotation
     if (m_orientation == SharedSignal::Orientation::rotate90)
     {
-        QMatrix4x4 qRotated = rotateAndOrtho(m_textureMatrix, m_orientation);
-        //printGLMaxtrix(qRotated.data());
+        QMatrix4x4 qRotated = rotateAndFlip(m_textureMatrix, m_orientation);
         glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_FALSE, qRotated.data());
     }
     else
@@ -145,9 +144,9 @@ void ShaderVideoMaterial::onSetOrientation(const SharedSignal::Orientation& orie
     qDebug() << "frameSize: " << size;
 }
 
-// Takes a GLfloat texture matrix and desired orientation, and outputs a rotated and ortho
-// projected matrix.
-QMatrix4x4 ShaderVideoMaterial::rotateAndOrtho(GLfloat *m, const SharedSignal::Orientation &orientation)
+// Takes a GLfloat texture matrix and desired orientation, and outputs a rotated and
+// horizontally flipped matrix
+QMatrix4x4 ShaderVideoMaterial::rotateAndFlip(GLfloat *m, const SharedSignal::Orientation &orientation)
 {
     QMatrix4x4 ret;
 
@@ -166,18 +165,23 @@ QMatrix4x4 ShaderVideoMaterial::rotateAndOrtho(GLfloat *m, const SharedSignal::O
                                        0, 0, 1, 0,
                                        0, 0, 0, 1);
 
+            const QMatrix4x4 qFlipX  (-1, 0, 0, 1,
+                                       0, 1, 0, 0,
+                                       0, 0, 1, 0,
+                                       0, 0, 0, 1);
+
             QMatrix4x4 qRowMajorTextureMatrix(m[0], m[4], m[8], m[12],
                                               m[1], m[5], m[9], m[13],
                                               m[2], m[6], m[10], m[14],
                                               m[3], m[7], m[11], m[15]);
 
             ret = qRowMajorTextureMatrix * qRotate90;
-            const float aspectRatio = static_cast<float>(m_frameSize.width()) / static_cast<float>(m_frameSize.height());
-            //qDebug() << "aspectRatio: " << aspectRatio;
-            ret.ortho(-aspectRatio, aspectRatio, -1, 1, -1, 1);
             // This must be done manually since OpenGLES 2.0 does not support doing the transpose
             // when uploading the matrix to the GPU. OpenGLES 3.0 supports this.
             ret = ret.transposed();
+            // Undo the Android mirroring. Since we already flipped height/width and rotated,
+            // do this about the horizontal axis.
+            ret = ret * qFlipX;
         }
         break;
         case SharedSignal::Orientation::rotate0:

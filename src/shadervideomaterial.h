@@ -64,7 +64,7 @@ private Q_SLOTS:
     void onSetOrientation(const SharedSignal::Orientation& orientation, const QSize &size);
 
 private:
-    QMatrix4x4 rotateAndOrtho(GLfloat *m, const SharedSignal::Orientation &orientation);
+    QMatrix4x4 rotateAndFlip(GLfloat *m, const SharedSignal::Orientation &orientation);
     void undoAndroidYFlip(GLfloat matrix[]);
     void printGLMaxtrix(GLfloat matrix[]);
     void printMaxtrix(float matrix[]);
