@@ -34,4 +34,3 @@ HEADERS += .  ../../src/shadervideomaterial.h \
 
 INCLUDEPATH += ../../src /usr/include/hybris/camera /usr/include/hybris/media /usr/include/libqtubuntu-media-signals
 LIBS += -lqtubuntu-media-signals
-//LIBS += -lunwind -lunwind-arm -lunwind-coredump -lunwind-ptrace
