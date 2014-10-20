@@ -116,7 +116,9 @@ bool ShaderVideoMaterial::updateTexture()
     }
 
     // See if the video needs rotation
-    if (m_orientation == SharedSignal::Orientation::rotate90)
+    if (m_orientation == SharedSignal::Orientation::rotate90 ||
+        m_orientation == SharedSignal::Orientation::rotate180 ||
+        m_orientation == SharedSignal::Orientation::rotate270)
     {
         QMatrix4x4 qRotated = rotateAndFlip(m_textureMatrix, m_orientation);
         glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_FALSE, qRotated.data());
@@ -153,6 +155,24 @@ QMatrix4x4 ShaderVideoMaterial::rotateAndFlip(GLfloat *m, const SharedSignal::Or
     if (m == NULL)
         return ret;
 
+    /* TODO: Because of the column-to-row major format change, horizontal flips
+     * are really vertical flips, and vice versa. An improvement that needs to happen
+     * to more generically handle any container transformation matrix is to not convert
+     * to row-major format.
+     */
+    QMatrix4x4 qRowMajorTextureMatrix(m[0], m[4], m[8], m[12],
+                                      m[1], m[5], m[9], m[13],
+                                      m[2], m[6], m[10], m[14],
+                                      m[3], m[7], m[11], m[15]);
+    const QMatrix4x4 qFlipH (-1,  0, 0, 1,
+                              0,  1, 0, 0,
+                              0,  0, 1, 0,
+                              0,  0, 0, 1);
+    const QMatrix4x4 qFlipV ( 1,  0, 0, 0,
+                              0, -1, 0, 1,
+                              0,  0, 1, 0,
+                              0,  0, 0, 1);
+
     switch (orientation)
     {
         case SharedSignal::Orientation::rotate90:
@@ -160,34 +180,48 @@ QMatrix4x4 ShaderVideoMaterial::rotateAndFlip(GLfloat *m, const SharedSignal::Or
             // FIXME: This matrix comes from the file container, but could not
             // get this actual matrix up from GStreamer to here, so hardcoded
             // for now.
-            const QMatrix4x4 qRotate90(0, 1, 0, 0,
-                                      -1, 0, 0, 0,
-                                       0, 0, 1, 0,
-                                       0, 0, 0, 1);
-
-            const QMatrix4x4 qFlipX  (-1, 0, 0, 1,
-                                       0, 1, 0, 0,
-                                       0, 0, 1, 0,
-                                       0, 0, 0, 1);
-
-            QMatrix4x4 qRowMajorTextureMatrix(m[0], m[4], m[8], m[12],
-                                              m[1], m[5], m[9], m[13],
-                                              m[2], m[6], m[10], m[14],
-                                              m[3], m[7], m[11], m[15]);
+            const QMatrix4x4 qRotate90 (0, 1, 0, 0,
+                                       -1, 0, 0, 0,
+                                        0, 0, 1, 0,
+                                        0, 0, 0, 1);
 
             ret = qRowMajorTextureMatrix * qRotate90;
             // This must be done manually since OpenGLES 2.0 does not support doing the transpose
             // when uploading the matrix to the GPU. OpenGLES 3.0 supports this.
             ret = ret.transposed();
             // Undo the Android mirroring. Since we already flipped height/width and rotated,
+            // do this about the vertical axis.
+            ret = ret * qFlipH;
+        }
+        break;
+        case SharedSignal::Orientation::rotate180:
+        {
+            ret = qRowMajorTextureMatrix * qFlipH;
+        }
+        break;
+        case SharedSignal::Orientation::rotate270:
+        {
+            // FIXME: This matrix comes from the file container, but could not
+            // get this actual matrix up from GStreamer to here, so hardcoded
+            // for now.
+            const QMatrix4x4 qRotate270( 0, 1, 0, 0,
+                                        -1, 0, 0, 0,
+                                         0, 0, 1, 0,
+                                         0, 0, 0, 1);
+
+            ret = qRowMajorTextureMatrix * qRotate270;
+            // This must be done manually since OpenGLES 2.0 does not support doing the transpose
+            // when uploading the matrix to the GPU. OpenGLES 3.0 supports this.
+            ret = ret.transposed();
+            // Undo the Android mirroring. Since we already flipped height/width and rotated,
             // do this about the horizontal axis.
-            ret = ret * qFlipX;
+            ret = ret * qFlipV;
         }
         break;
         case SharedSignal::Orientation::rotate0:
-        case SharedSignal::Orientation::rotate180:
-        case SharedSignal::Orientation::rotate270:
+            // No-op, no rotation needed
         default:
+            qDebug() << "Not rotating";
             break;
     }
 
