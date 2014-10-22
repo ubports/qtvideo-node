@@ -1,3 +1,11 @@
+qtvideo-node (0.2.1+14.10.20141022~rtm-0ubuntu1) 14.09; urgency=low
+
+  [ Jim Hodapp ]
+  * Rotate the video 90 degrees and do an orthographic projection when
+    necessary, otherwise render same as always. (LP: #1191934)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 22 Oct 2014 16:19:20 +0000
+
 qtvideo-node (0.2.1+14.10.20140609-0ubuntu1) utopic; urgency=low
 
   [ Ubuntu daily release ]
