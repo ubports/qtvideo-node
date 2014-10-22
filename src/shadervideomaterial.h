@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical, Ltd.
+ * Copyright (C) 2013-2014 Canonical, Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -23,15 +23,19 @@
 #else
 #include <QtQuick/QSGMaterial>
 #endif
-#include <QVideoSurfaceFormat>
 #include <qgl.h>
+#include <QMatrix4x4>
+#include <QObject>
+#include <QVideoSurfaceFormat>
+#include <qtubuntu_media_signals.h>
 
 struct CameraControl;
 struct MediaPlayerWrapper;
 class ShaderVideoShader;
 
-class ShaderVideoMaterial : public QSGMaterial
+class ShaderVideoMaterial : public QObject, public QSGMaterial
 {
+    Q_OBJECT
 public:
     typedef void* SurfaceTextureClientHybris;
     typedef void* GLConsumerWrapperHybris;
@@ -54,11 +58,16 @@ public:
 
     bool updateTexture();
 
-    GLfloat m_textureMatrix[16];
+    GLfloat m_textureMatrix[16] {};
+
+private Q_SLOTS:
+    void onSetOrientation(const SharedSignal::Orientation& orientation, const QSize &size);
 
 private:
+    QMatrix4x4 rotateAndFlip(GLfloat *m, const SharedSignal::Orientation &orientation);
     void undoAndroidYFlip(GLfloat matrix[]);
     void printGLMaxtrix(GLfloat matrix[]);
+    void printMaxtrix(float matrix[]);
 
     QVideoSurfaceFormat m_format;
     CameraControl *m_camControl;
@@ -67,6 +76,8 @@ private:
     GLConsumerWrapperHybris m_glConsumer;
     bool m_readyToRender;
     static ShaderVideoShader *m_videoShader; // the shader is cached in the Qt scene graph
+    SharedSignal::Orientation m_orientation;
+    QSize m_frameSize;
 };
 
 #endif // SHADERVIDEOMATERIAL_H

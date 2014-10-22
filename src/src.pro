@@ -1,6 +1,6 @@
 TARGET = shadervideonode
 TEMPLATE = lib
-CONFIG += plugin
+CONFIG += plugin c++11
 QT += multimedia opengl quick-private quick
 
 include(../coverage.pri)

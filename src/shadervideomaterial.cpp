@@ -22,6 +22,8 @@
 #endif
 
 #include <QGLShaderProgram>
+#include <QtOpenGL>
+#include <QTransform>
 
 #include <QtCore/qdebug.h>
 
@@ -29,6 +31,7 @@
 #include "shadervideoshader.h"
 
 #include <camera_compatibility_layer.h>
+#include <qtubuntu_media_signals.h>
 #include <surface_texture_client_hybris.h>
 
 ShaderVideoShader *ShaderVideoMaterial::m_videoShader = 0;
@@ -39,8 +42,11 @@ ShaderVideoMaterial::ShaderVideoMaterial(const QVideoSurfaceFormat &format)
       m_textureId(0),
       m_surfaceTextureClient(0),
       m_glConsumer(0),
-      m_readyToRender(false)
+      m_readyToRender(false),
+      m_orientation(SharedSignal::Orientation::rotate0)
 {
+    connect(SharedSignal::instance(), SIGNAL(setOrientation(const SharedSignal::Orientation&, const QSize&)),
+            this, SLOT(onSetOrientation(const SharedSignal::Orientation&, const QSize&)));
 }
 
 QSGMaterialShader *ShaderVideoMaterial::createShader() const
@@ -109,8 +115,19 @@ bool ShaderVideoMaterial::updateTexture()
         textureDirty = true;
     }
 
-    undoAndroidYFlip(m_textureMatrix);
-    glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_FALSE, m_textureMatrix);
+    // See if the video needs rotation
+    if (m_orientation == SharedSignal::Orientation::rotate90 ||
+        m_orientation == SharedSignal::Orientation::rotate180 ||
+        m_orientation == SharedSignal::Orientation::rotate270)
+    {
+        QMatrix4x4 qRotated = rotateAndFlip(m_textureMatrix, m_orientation);
+        glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_FALSE, qRotated.data());
+    }
+    else
+    {
+        undoAndroidYFlip(m_textureMatrix);
+        glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_FALSE, m_textureMatrix);
+    }
 
     glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -118,6 +135,97 @@ bool ShaderVideoMaterial::updateTexture()
     glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     return textureDirty;
+}
+
+void ShaderVideoMaterial::onSetOrientation(const SharedSignal::Orientation& orientation,
+        const QSize &size)
+{
+    m_orientation = orientation;
+    m_frameSize = size;
+    qDebug() << "orientation: " << orientation;
+    qDebug() << "frameSize: " << size;
+}
+
+// Takes a GLfloat texture matrix and desired orientation, and outputs a rotated and
+// horizontally flipped matrix
+QMatrix4x4 ShaderVideoMaterial::rotateAndFlip(GLfloat *m, const SharedSignal::Orientation &orientation)
+{
+    QMatrix4x4 ret;
+
+    if (m == NULL)
+        return ret;
+
+    /* TODO: Because of the column-to-row major format change, horizontal flips
+     * are really vertical flips, and vice versa. An improvement that needs to happen
+     * to more generically handle any container transformation matrix is to not convert
+     * to row-major format.
+     */
+    QMatrix4x4 qRowMajorTextureMatrix(m[0], m[4], m[8], m[12],
+                                      m[1], m[5], m[9], m[13],
+                                      m[2], m[6], m[10], m[14],
+                                      m[3], m[7], m[11], m[15]);
+    const QMatrix4x4 qFlipH (-1,  0, 0, 1,
+                              0,  1, 0, 0,
+                              0,  0, 1, 0,
+                              0,  0, 0, 1);
+    const QMatrix4x4 qFlipV ( 1,  0, 0, 0,
+                              0, -1, 0, 1,
+                              0,  0, 1, 0,
+                              0,  0, 0, 1);
+
+    switch (orientation)
+    {
+        case SharedSignal::Orientation::rotate90:
+        {
+            // FIXME: This matrix comes from the file container, but could not
+            // get this actual matrix up from GStreamer to here, so hardcoded
+            // for now.
+            const QMatrix4x4 qRotate90 (0, 1, 0, 0,
+                                       -1, 0, 0, 0,
+                                        0, 0, 1, 0,
+                                        0, 0, 0, 1);
+
+            ret = qRowMajorTextureMatrix * qRotate90;
+            // This must be done manually since OpenGLES 2.0 does not support doing the transpose
+            // when uploading the matrix to the GPU. OpenGLES 3.0 supports this.
+            ret = ret.transposed();
+            // Undo the Android mirroring. Since we already flipped height/width and rotated,
+            // do this about the vertical axis.
+            ret = ret * qFlipH;
+        }
+        break;
+        case SharedSignal::Orientation::rotate180:
+        {
+            ret = qRowMajorTextureMatrix * qFlipH;
+        }
+        break;
+        case SharedSignal::Orientation::rotate270:
+        {
+            // FIXME: This matrix comes from the file container, but could not
+            // get this actual matrix up from GStreamer to here, so hardcoded
+            // for now.
+            const QMatrix4x4 qRotate270( 0, 1, 0, 0,
+                                        -1, 0, 0, 0,
+                                         0, 0, 1, 0,
+                                         0, 0, 0, 1);
+
+            ret = qRowMajorTextureMatrix * qRotate270;
+            // This must be done manually since OpenGLES 2.0 does not support doing the transpose
+            // when uploading the matrix to the GPU. OpenGLES 3.0 supports this.
+            ret = ret.transposed();
+            // Undo the Android mirroring. Since we already flipped height/width and rotated,
+            // do this about the horizontal axis.
+            ret = ret * qFlipV;
+        }
+        break;
+        case SharedSignal::Orientation::rotate0:
+            // No-op, no rotation needed
+        default:
+            qDebug() << "Not rotating";
+            break;
+    }
+
+    return ret;
 }
 
 void ShaderVideoMaterial::undoAndroidYFlip(GLfloat matrix[])
@@ -133,7 +241,7 @@ void ShaderVideoMaterial::undoAndroidYFlip(GLfloat matrix[])
 
 /*!
  * \brief ShaderVideoMaterial::printGLMaxtrix
- * Prints a OpenGL matrix (GLfloat m[16]) to std out.
+ * Prints an EGL matrix (GLfloat m[16]) to stdout.
  * This function stays here for convenience in case some more debugging is necessary for the android
  * transformation matrix.
  * \param matrix Matrix to be printed to std out
@@ -144,4 +252,16 @@ void ShaderVideoMaterial::printGLMaxtrix(GLfloat matrix[])
     qDebug() << matrix[1] << matrix[5] << matrix[9] << matrix[13];
     qDebug() << matrix[2] << matrix[6] << matrix[10] << matrix[14];
     qDebug() << matrix[3] << matrix[7] << matrix[11] << matrix[15];
+}
+
+/*!
+ * \brief Prints a row-major matrix to stdout.
+ * \param matrix Matrix to be printed to std out
+ */
+void ShaderVideoMaterial::printMaxtrix(float matrix[])
+{
+    qDebug() << matrix[0] << matrix[1] << matrix[2] << matrix[3];
+    qDebug() << matrix[4] << matrix[5] << matrix[6] << matrix[7];
+    qDebug() << matrix[8] << matrix[9] << matrix[10] << matrix[11];
+    qDebug() << matrix[12] << matrix[13] << matrix[14] << matrix[15];
 }
