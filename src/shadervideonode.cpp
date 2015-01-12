@@ -72,7 +72,7 @@ void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
             return;
         }
         m_material->setCamControl((CameraControl*)ci);
-    } else if (frame.availableMetaData().contains("GLConsumer")) {
+    } else if (frame.availableMetaData().contains("GLVideoSink")) {
         qDebug() << "** Setting GLConsumer instance";
         auto sink = frame.metaData("GLVideoSink").value<std::shared_ptr<core::ubuntu::media::video::Sink>>();
         m_material->setGLVideoSink(sink);

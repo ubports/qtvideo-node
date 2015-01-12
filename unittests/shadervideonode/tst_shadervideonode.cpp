@@ -22,6 +22,8 @@
 
 #include <shadervideomaterial.h>
 
+#include <core/media/video/sink.h>
+
 #include <qtubuntu_media_signals.h>
 
 #include "camera_compatibility_layer.h"
@@ -31,6 +33,8 @@
 
 #include "shadervideonode.h"
 
+namespace
+{
 class tst_ShaderVideoNode : public QObject
 {
     Q_OBJECT
@@ -76,6 +80,26 @@ private:
     unsigned int m_textureId;
 };
 
+struct NullSink : public core::ubuntu::media::video::Sink
+{
+    const core::Signal<void>& frame_available() const
+    {
+        static core::Signal<void> sig; return sig;
+    }
+
+    bool transformation_matrix(float*) const
+    {
+        return true;
+    }
+
+    bool swap_buffers() const
+    {
+        return true;
+    }
+};
+
+}
+
 void tst_ShaderVideoNode::initTestCase()
 {
     m_glConsumerSet = false;
@@ -114,7 +138,7 @@ void tst_ShaderVideoNode::testGLConsumerSetCurrentFrame()
 
     node.setCurrentFrame(frame);
 
-    std::shared_ptr<core::ubuntu::media::video::Sink> sink;
+    std::shared_ptr<core::ubuntu::media::video::Sink> sink{new NullSink()};
 
     frame.setMetaData("GLVideoSink", QVariant::fromValue(sink));
     node.setCurrentFrame(frame);
