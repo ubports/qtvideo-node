@@ -28,8 +28,7 @@
  */
 ShaderVideoNode::ShaderVideoNode(const QVideoSurfaceFormat &format) :
     m_format(format),
-    m_textureId(0),
-    m_glConsumer(0)
+    m_textureId(0)
 {
     m_material = new ShaderVideoMaterial(format);
     setMaterial(m_material);
@@ -75,11 +74,10 @@ void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
         m_material->setCamControl((CameraControl*)ci);
     } else if (frame.availableMetaData().contains("GLConsumer")) {
         qDebug() << "** Setting GLConsumer instance";
-        m_glConsumer = reinterpret_cast<GLConsumerWrapperHybris>(
-            frame.metaData("GLConsumer").value<unsigned int>());
-        m_material->setGLConsumer(m_glConsumer);
-        if (m_glConsumer == 0) {
-            qWarning() << "No valid GLConsumerWrapperHybris instance in video frame";
+        auto sink = frame.metaData("GLVideoSink").value<std::shared_ptr<core::ubuntu::media::video::Sink>>();
+        m_material->setGLVideoSink(sink);
+        if (not sink) {
+            qWarning() << "No valid GL video sink instance in video frame";
             return;
         }
 

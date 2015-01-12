@@ -114,12 +114,11 @@ void tst_ShaderVideoNode::testGLConsumerSetCurrentFrame()
 
     node.setCurrentFrame(frame);
 
-    GLConsumerWrapperHybris *gl_consumer = new GLConsumerWrapperHybris;
+    std::shared_ptr<core::ubuntu::media::video::Sink> sink;
 
-    frame.setMetaData("GLConsumer", QVariant::fromValue(reinterpret_cast<uint64_t>(gl_consumer)));
+    frame.setMetaData("GLVideoSink", QVariant::fromValue(sink));
     node.setCurrentFrame(frame);
-    QCOMPARE(QVariant(QMetaType::VoidStar, node.m_material->glConsumer()),
-             QVariant(QMetaType::VoidStar, gl_consumer));
+    QCOMPARE(node.m_material->glVideoSink(), sink);
 
     QVERIFY(m_glConsumerSet == true);
 }

@@ -29,6 +29,12 @@
 #include <QVideoSurfaceFormat>
 #include <qtubuntu_media_signals.h>
 
+#include <memory>
+
+namespace core { namespace ubuntu { namespace media { namespace video {
+class Sink;
+} } } }
+
 struct CameraControl;
 struct MediaPlayerWrapper;
 class ShaderVideoShader;
@@ -53,8 +59,8 @@ public:
     GLuint textureId() const { return m_textureId; }
 
     void setSurfaceTextureClient(SurfaceTextureClientHybris surface_texture_client);
-    void setGLConsumer(GLConsumerWrapperHybris gl_consumer);
-    GLConsumerWrapperHybris glConsumer() const;
+    void setGLVideoSink(const std::shared_ptr<core::ubuntu::media::video::Sink>& sink);
+    const std::shared_ptr<core::ubuntu::media::video::Sink>& glVideoSink() const;
 
     bool updateTexture();
 
@@ -73,7 +79,7 @@ private:
     CameraControl *m_camControl;
     GLuint m_textureId;
     SurfaceTextureClientHybris m_surfaceTextureClient;
-    GLConsumerWrapperHybris m_glConsumer;
+    std::shared_ptr<core::ubuntu::media::video::Sink> m_videoSink;
     bool m_readyToRender;
     static ShaderVideoShader *m_videoShader; // the shader is cached in the Qt scene graph
     SharedSignal::Orientation m_orientation;
