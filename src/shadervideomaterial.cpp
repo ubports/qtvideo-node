@@ -45,6 +45,28 @@ ShaderVideoMaterial::ShaderVideoMaterial(const QVideoSurfaceFormat &format)
       m_readyToRender(false),
       m_orientation(SharedSignal::Orientation::rotate0)
 {
+    /* FIXME: workaround incorrect z-ordering when VideoOutput is rotated.
+     * In the following case VideoOutput is rendered on top of all other
+     * Items in the scene but one. The issue is most likely related with
+     * how QtQuick scenegraph's batch renderer draws the nodes.
+     * When angle is 0, the ShaderVideoNode is marked as merged and there is
+     * no issue. When set to a different value it is marked forever as unmerged
+     * and the z-ordering becomes incorrect. Setting the CustomCompileStep flag
+     * makes it marked as unmerged from the beginning and the z-ordering issue
+     * never occurs.
+     *
+     * VideoOutput {
+     *     transform: [
+     *         Rotation {
+     *             axis.x: 0; axis.y: 1; axis.z: 0
+     *             angle: -20
+     *         }
+     *     ]
+     *  }
+     *
+     * Ref.: https://bugs.launchpad.net/camera-app/+bug/1373607
+     */
+    setFlag(CustomCompileStep, true);
     connect(SharedSignal::instance(), SIGNAL(setOrientation(const SharedSignal::Orientation&, const QSize&)),
             this, SLOT(onSetOrientation(const SharedSignal::Orientation&, const QSize&)));
 }
