@@ -1,2 +1,3 @@
 TEMPLATE = subdirs
-SUBDIRS += shadervideonode
+SUBDIRS += shadervideonode \
+    tst_videooutput
