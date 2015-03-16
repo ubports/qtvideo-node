@@ -15,6 +15,10 @@ Build-Depends: debhelper (>= 9),
                qtdeclarative5-dev,
                qtdeclarative5-private-dev,
                qtmultimedia5-dev,
+               qml-module-qttest,
+               qml-module-qtmultimedia,
+               qml-module-qtquick2,
+               xvfb,
 Standards-Version: 3.9.4
 Homepage: https://launchpad.net/qtvideo-node
 # If you aren't a member of ~phablet-team but need to upload packaging changes,
