@@ -1,3 +1,14 @@
+qtvideo-node (0.2.1+15.04.20150316-0ubuntu1) vivid; urgency=medium
+
+  [ CI Train Bot ]
+  * New rebuild forced.
+
+  [ Florian Boucault ]
+  * Workaround issue where z-ordering of VideoOutput's QML item is
+    incorrect when rotated. (LP: #1373607)
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Mon, 16 Mar 2015 13:16:47 +0000
+
 qtvideo-node (0.2.1+15.04.20141104-0ubuntu3) vivid; urgency=medium
 
   * No-change rebuild against Qt 5.4.0.
