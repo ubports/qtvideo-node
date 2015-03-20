@@ -30,6 +30,8 @@
 #include "shadervideomaterial.h"
 #include "shadervideoshader.h"
 
+#include <core/media/video/sink.h>
+
 #include <camera_compatibility_layer.h>
 #include <qtubuntu_media_signals.h>
 #include <surface_texture_client_hybris.h>
@@ -41,7 +43,6 @@ ShaderVideoMaterial::ShaderVideoMaterial(const QVideoSurfaceFormat &format)
       m_camControl(0),
       m_textureId(0),
       m_surfaceTextureClient(0),
-      m_glConsumer(0),
       m_readyToRender(false),
       m_orientation(SharedSignal::Orientation::rotate0)
 {
@@ -107,21 +108,21 @@ void ShaderVideoMaterial::setSurfaceTextureClient(SurfaceTextureClientHybris sur
     m_surfaceTextureClient = surface_texture_client;
 }
 
-void ShaderVideoMaterial::setGLConsumer(GLConsumerWrapperHybris gl_consumer)
+void ShaderVideoMaterial::setGLVideoSink(const std::shared_ptr<core::ubuntu::media::video::Sink>& sink)
 {
-    m_glConsumer = gl_consumer;
+    m_videoSink = sink;
 }
 
-GLConsumerWrapperHybris ShaderVideoMaterial::glConsumer() const
+const std::shared_ptr<core::ubuntu::media::video::Sink>& ShaderVideoMaterial::glVideoSink() const
 {
-    return m_glConsumer;
+    return m_videoSink;
 }
 
 bool ShaderVideoMaterial::updateTexture()
 {
     bool textureDirty = false;
 
-    if (!m_camControl && !m_textureId && !m_glConsumer) {
+    if (!m_camControl && !m_textureId && !m_videoSink) {
         return false;
     }
 
@@ -129,12 +130,13 @@ bool ShaderVideoMaterial::updateTexture()
         android_camera_update_preview_texture(m_camControl);
         android_camera_get_preview_texture_transformation(m_camControl, m_textureMatrix);
         textureDirty = true;
-    } else if (m_glConsumer != NULL && !m_readyToRender) {
+    } else if (m_videoSink && !m_readyToRender) {
         m_readyToRender = true;
-    } else if (m_glConsumer != NULL && m_readyToRender) {
-        gl_consumer_update_texture(m_glConsumer);
-        gl_consumer_get_transformation_matrix(m_glConsumer, static_cast<float*>(m_textureMatrix));
-        textureDirty = true;
+    } else if (m_videoSink && m_readyToRender) {
+        if (m_videoSink->swap_buffers()) {
+            m_videoSink->transformation_matrix(static_cast<float*>(m_textureMatrix));
+            textureDirty = true;
+        }
     }
 
     // See if the video needs rotation

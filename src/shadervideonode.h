@@ -21,6 +21,12 @@
 #include <QObject>
 #include <private/qsgvideonode_p.h>
 
+#include <memory>
+
+namespace core { namespace ubuntu { namespace media { namespace video {
+class Sink;
+} } } }
+
 class CameraControl;
 class ShaderVideoMaterial;
 class SnapshotGenerator;
@@ -48,8 +54,10 @@ private:
     QVideoSurfaceFormat m_format;
     ShaderVideoMaterial *m_material;
     GLuint m_textureId;
-    GLConsumerWrapperHybris m_glConsumer;
+    std::shared_ptr<core::ubuntu::media::video::Sink> m_videoSink;
     SnapshotGenerator *m_snapshotGenerator;
 };
+
+Q_DECLARE_METATYPE(std::shared_ptr<core::ubuntu::media::video::Sink>);
 
 #endif // SHADERVIDEONODE_H
