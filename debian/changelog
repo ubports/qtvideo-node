@@ -1,3 +1,13 @@
+qtvideo-node (0.2.1+15.04.20150320-0ubuntu1) vivid; urgency=medium
+
+  [ CI Train Bot ]
+  * New rebuild forced.
+
+  [ thomas-voss ]
+  * Adjust to interface changes in media hub.
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Fri, 20 Mar 2015 13:17:31 +0000
+
 qtvideo-node (0.2.1+15.04.20150316-0ubuntu1) vivid; urgency=medium
 
   [ CI Train Bot ]
