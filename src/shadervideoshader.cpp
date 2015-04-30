@@ -29,10 +29,21 @@ void ShaderVideoShader::updateState(const RenderState &state,
 {
     Q_UNUSED(oldMaterial);
     ShaderVideoMaterial *mat = dynamic_cast<ShaderVideoMaterial *>(newMaterial);
+
+#if !defined(QT_OPENGL_ES_2)
+    const GLenum textureTarget = GL_TEXTURE_2D;
+#else
+    const GLenum textureTarget = GL_TEXTURE_EXTERNAL_OES;
+#endif
+    glBindTexture(textureTarget, mat->textureId());
+    glTexParameteri(textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
     program()->setUniformValue(m_id_texture, 0);
 
-    if (mat->updateTexture())
-        program()->setUniformValueArray(m_id_matrix, mat->m_textureMatrix, 16, 1);
+    program()->setUniformValueArray(m_tex_matrix, mat->m_textureMatrix, 16, 1);
 
     if (state.isOpacityDirty())
         program()->setUniformValue(m_id_opacity, state.opacity());

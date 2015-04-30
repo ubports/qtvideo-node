@@ -14,13 +14,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef QT_OPENGL_ES_2
-# define TEXTURE_TARGET GL_TEXTURE_EXTERNAL_OES
-#else
-# define TEXTURE_TARGET GL_TEXTURE_2D
-# define GL_GLEXT_PROTOTYPES
-#endif
-
 #include <QGLShaderProgram>
 #include <QtOpenGL>
 #include <QTransform>
@@ -118,24 +111,21 @@ const std::shared_ptr<core::ubuntu::media::video::Sink>& ShaderVideoMaterial::gl
     return m_videoSink;
 }
 
-bool ShaderVideoMaterial::updateTexture()
+void ShaderVideoMaterial::updateTexture()
 {
-    bool textureDirty = false;
-
     if (!m_camControl && !m_textureId && !m_videoSink) {
-        return false;
+        return;
     }
 
     if (m_camControl != NULL) {
         android_camera_update_preview_texture(m_camControl);
         android_camera_get_preview_texture_transformation(m_camControl, m_textureMatrix);
-        textureDirty = true;
     } else if (m_videoSink && !m_readyToRender) {
         m_readyToRender = true;
+        return;
     } else if (m_videoSink && m_readyToRender) {
         if (m_videoSink->swap_buffers()) {
             m_videoSink->transformation_matrix(static_cast<float*>(m_textureMatrix));
-            textureDirty = true;
         }
     }
 
@@ -144,21 +134,13 @@ bool ShaderVideoMaterial::updateTexture()
         m_orientation == SharedSignal::Orientation::rotate180 ||
         m_orientation == SharedSignal::Orientation::rotate270)
     {
-        QMatrix4x4 qRotated = rotateAndFlip(m_textureMatrix, m_orientation);
-        glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_FALSE, qRotated.data());
+        memcpy(m_textureMatrix, rotateAndFlip(m_textureMatrix, m_orientation).data(),
+               sizeof(m_textureMatrix));
     }
     else
     {
         undoAndroidYFlip(m_textureMatrix);
-        glUniformMatrix4fv(m_videoShader->m_tex_matrix, 1, GL_FALSE, m_textureMatrix);
     }
-
-    glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(TEXTURE_TARGET, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    return textureDirty;
 }
 
 void ShaderVideoMaterial::onSetOrientation(const SharedSignal::Orientation& orientation,

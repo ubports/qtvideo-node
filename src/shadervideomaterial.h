@@ -62,7 +62,7 @@ public:
     void setGLVideoSink(const std::shared_ptr<core::ubuntu::media::video::Sink>& sink);
     const std::shared_ptr<core::ubuntu::media::video::Sink>& glVideoSink() const;
 
-    bool updateTexture();
+    void updateTexture();
 
     GLfloat m_textureMatrix[16] {};
 
