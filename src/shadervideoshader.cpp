@@ -35,15 +35,15 @@ void ShaderVideoShader::updateState(const RenderState &state,
 #else
     const GLenum textureTarget = GL_TEXTURE_EXTERNAL_OES;
 #endif
-    glBindTexture(textureTarget, mat->textureId());
-    glTexParameteri(textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    m_functions->glBindTexture(textureTarget, mat->textureId());
+    m_functions->glTexParameteri(textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    m_functions->glTexParameteri(textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    m_functions->glTexParameteri(textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    m_functions->glTexParameteri(textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     program()->setUniformValue(m_id_texture, 0);
 
-    glUniformMatrix4fv(m_tex_matrix, 1, GL_FALSE, mat->m_textureMatrix);
+    m_functions->glUniformMatrix4fv(m_tex_matrix, 1, GL_FALSE, mat->m_textureMatrix);
 
     if (state.isOpacityDirty())
         program()->setUniformValue(m_id_opacity, state.opacity());
@@ -93,6 +93,7 @@ const char *ShaderVideoShader::fragmentShader() const
 
 void ShaderVideoShader::initialize()
 {
+    m_functions = QOpenGLContext::currentContext()->functions();
     m_id_matrix = program()->uniformLocation("qt_Matrix");
     m_id_texture = program()->uniformLocation("sTexture");
     m_id_opacity = program()->uniformLocation("opacity");
