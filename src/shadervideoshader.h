@@ -23,7 +23,6 @@
 #else
 #include <QtQuick/QSGMaterialShader>
 #endif
-#include <QtGui/QOpenGLFunctions>
 #include <QVideoFrame>
 
 class ShaderVideoShader : public QSGMaterialShader
@@ -43,7 +42,6 @@ protected:
 
     void initialize();
 
-    QOpenGLFunctions *m_functions;
     int m_id_matrix;
     int m_id_texture;
     int m_id_opacity;
