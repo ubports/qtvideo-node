@@ -16,6 +16,7 @@
 
 #include "shadervideoshader.h"
 #include "shadervideomaterial.h"
+#include <QtGui/QOpenGLFunctions>
 
 ShaderVideoShader::ShaderVideoShader(QVideoFrame::PixelFormat pixelFormat)
     : QSGMaterialShader(),
@@ -29,10 +30,22 @@ void ShaderVideoShader::updateState(const RenderState &state,
 {
     Q_UNUSED(oldMaterial);
     ShaderVideoMaterial *mat = dynamic_cast<ShaderVideoMaterial *>(newMaterial);
+    QOpenGLFunctions *functions = QOpenGLContext::currentContext()->functions();
+
+#if !defined(QT_OPENGL_ES_2)
+    const GLenum textureTarget = GL_TEXTURE_2D;
+#else
+    const GLenum textureTarget = GL_TEXTURE_EXTERNAL_OES;
+#endif
+    functions->glBindTexture(textureTarget, mat->textureId());
+    functions->glTexParameteri(textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    functions->glTexParameteri(textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    functions->glTexParameteri(textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    functions->glTexParameteri(textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
     program()->setUniformValue(m_id_texture, 0);
 
-    if (mat->updateTexture())
-        program()->setUniformValueArray(m_id_matrix, mat->m_textureMatrix, 16, 1);
+    functions->glUniformMatrix4fv(m_tex_matrix, 1, GL_FALSE, mat->m_textureMatrix);
 
     if (state.isOpacityDirty())
         program()->setUniformValue(m_id_opacity, state.opacity());

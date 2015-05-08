@@ -40,6 +40,8 @@ public:
     ShaderVideoNode(const QVideoSurfaceFormat &format);
     ~ShaderVideoNode();
 
+    void preprocess();
+
     QVideoFrame::PixelFormat pixelFormat() const;
     void setCurrentFrame(const QVideoFrame &frame);
 

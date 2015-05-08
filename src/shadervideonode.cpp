@@ -30,6 +30,8 @@ ShaderVideoNode::ShaderVideoNode(const QVideoSurfaceFormat &format) :
     m_format(format),
     m_textureId(0)
 {
+    QSGNode::setFlag(UsePreprocess, true);
+
     m_material = new ShaderVideoMaterial(format);
     setMaterial(m_material);
 
@@ -45,6 +47,11 @@ ShaderVideoNode::~ShaderVideoNode()
 {
     deleteTextureID();
     delete m_snapshotGenerator;
+}
+
+void ShaderVideoNode::preprocess()
+{
+    m_material->updateTexture();
 }
 
 /*!
@@ -143,6 +150,7 @@ void ShaderVideoNode::getGLTextureID()
         return;
     }
 
+    m_material->setTextureId(m_textureId);
     Q_EMIT SharedSignal::instance()->textureCreated(static_cast<unsigned int>(m_textureId));
 }
 
@@ -156,4 +164,6 @@ void ShaderVideoNode::deleteTextureID()
         glDeleteTextures(1, &m_textureId);
 #endif
     m_textureId = 0;
+
+    m_material->setTextureId(0);
 }
