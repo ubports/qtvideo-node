@@ -159,6 +159,12 @@ void ShaderVideoMaterial::onSetOrientation(const SharedSignal::Orientation& orie
 // m_videoSink->swap_buffers() until a new valid m_videoSink pointer is set.
 void ShaderVideoMaterial::onSinkReset()
 {
+    qDebug() << Q_FUNC_INFO;
+
+    // Make sure we free any locked graphics buffer
+    if (m_videoSink && m_readyToRender)
+        m_videoSink->swap_buffers();
+
     m_videoSink.reset();
     m_readyToRender = false;
 }
