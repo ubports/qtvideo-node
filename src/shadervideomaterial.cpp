@@ -150,8 +150,6 @@ void ShaderVideoMaterial::onSetOrientation(const SharedSignal::Orientation& orie
 {
     m_orientation = orientation;
     m_frameSize = size;
-    qDebug() << "orientation: " << orientation;
-    qDebug() << "frameSize: " << size;
 }
 
 // Makes sure that when a playing a video, if a new video is requested for playback during
@@ -159,6 +157,12 @@ void ShaderVideoMaterial::onSetOrientation(const SharedSignal::Orientation& orie
 // m_videoSink->swap_buffers() until a new valid m_videoSink pointer is set.
 void ShaderVideoMaterial::onSinkReset()
 {
+    qDebug() << Q_FUNC_INFO;
+
+    // Make sure we free any locked graphics buffer
+    if (m_videoSink && m_readyToRender)
+        m_videoSink->swap_buffers();
+
     m_videoSink.reset();
     m_readyToRender = false;
 }
