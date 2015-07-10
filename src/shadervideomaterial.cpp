@@ -61,8 +61,10 @@ ShaderVideoMaterial::ShaderVideoMaterial(const QVideoSurfaceFormat &format)
      * Ref.: https://bugs.launchpad.net/camera-app/+bug/1373607
      */
     setFlag(CustomCompileStep, true);
-    connect(SharedSignal::instance(), SIGNAL(setOrientation(const SharedSignal::Orientation&, const QSize&)),
-            this, SLOT(onSetOrientation(const SharedSignal::Orientation&, const QSize&)));
+    connect(SharedSignal::instance(), &SharedSignal::setOrientation,
+            this, &ShaderVideoMaterial::onSetOrientation);
+    connect(SharedSignal::instance(), &SharedSignal::sinkReset,
+            this, &ShaderVideoMaterial::onSinkReset);
 }
 
 QSGMaterialShader *ShaderVideoMaterial::createShader() const
@@ -148,8 +150,21 @@ void ShaderVideoMaterial::onSetOrientation(const SharedSignal::Orientation& orie
 {
     m_orientation = orientation;
     m_frameSize = size;
-    qDebug() << "orientation: " << orientation;
-    qDebug() << "frameSize: " << size;
+}
+
+// Makes sure that when a playing a video, if a new video is requested for playback during
+// playback of the first video using the same player session, that we don't try and call
+// m_videoSink->swap_buffers() until a new valid m_videoSink pointer is set.
+void ShaderVideoMaterial::onSinkReset()
+{
+    qDebug() << Q_FUNC_INFO;
+
+    // Make sure we free any locked graphics buffer
+    if (m_videoSink && m_readyToRender)
+        m_videoSink->swap_buffers();
+
+    m_videoSink.reset();
+    m_readyToRender = false;
 }
 
 // Takes a GLfloat texture matrix and desired orientation, and outputs a rotated and

@@ -68,6 +68,7 @@ public:
 
 private Q_SLOTS:
     void onSetOrientation(const SharedSignal::Orientation& orientation, const QSize &size);
+    void onSinkReset();
 
 private:
     QMatrix4x4 rotateAndFlip(GLfloat *m, const SharedSignal::Orientation &orientation);
