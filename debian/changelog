@@ -1,4 +1,4 @@
-qtvideo-node (0.2.1+15.04.20150710-0ubuntu3) vivid; urgency=medium
+qtvideo-node (0.2.1+15.04.20150710-0ubuntu3) UNRELEASED; urgency=medium
 
   * No change rebuild to sync to vivid+overlay
 
