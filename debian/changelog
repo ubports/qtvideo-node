@@ -1,8 +1,13 @@
-qtvideo-node (0.2.1+15.04.20150710-0ubuntu3) UNRELEASED; urgency=medium
+qtvideo-node (0.2.1+15.04.20150828-0ubuntu1) vivid; urgency=medium
 
+  [ Jim Hodapp ]
   * No change rebuild to sync to vivid+overlay
+  * Correct qtubuntu-media-signals version for depedency
 
- -- Jim Hodapp <jim.hodapp@canonical.com>  Fri, 07 Aug 2015 10:54:41 -0400
+  [ CI Train Bot ]
+  * New rebuild forced.
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Fri, 28 Aug 2015 13:52:47 +0000
 
 qtvideo-node (0.2.1+15.04.20150710-0ubuntu1) vivid; urgency=medium
 
