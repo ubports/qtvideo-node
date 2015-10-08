@@ -69,7 +69,7 @@ QVideoFrame::PixelFormat ShaderVideoNode::pixelFormat() const
  * back.
  * \param frame
  */
-void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
+void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame, FrameFlags flags)
 {
     void *ci = 0;
     if (frame.availableMetaData().contains("CamControl")) {
@@ -103,6 +103,15 @@ void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame)
         // Draw the frame
         markDirty(QSGNode::DirtyMaterial);
     }
+}
+
+/*!
+ * \brief ShaderVideoNode::HandleType \reimp
+ * \return
+ */
+QAbstractVideoBuffer::HandleType ShaderVideoNode::handleType() const
+{
+    return QAbstractVideoBuffer::GLTextureHandle;
 }
 
 /*!

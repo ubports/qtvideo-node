@@ -17,7 +17,7 @@
 #ifndef SHADERVIDEONODEPLUGIN_H
 #define SHADERVIDEONODEPLUGIN_H
 
-#include <private/qsgvideonode_p.h>
+#include <qsgvideonode_p.h>
 #include <QVideoSurfaceFormat>
 
 class ShaderVideoNodePlugin : public QObject, public QSGVideoNodeFactoryInterface

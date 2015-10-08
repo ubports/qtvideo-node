@@ -19,7 +19,7 @@
 
 #include <qgl.h>
 #include <QObject>
-#include <private/qsgvideonode_p.h>
+#include <qsgvideonode_p.h>
 
 #include <memory>
 
@@ -43,7 +43,8 @@ public:
     void preprocess();
 
     QVideoFrame::PixelFormat pixelFormat() const;
-    void setCurrentFrame(const QVideoFrame &frame);
+    void setCurrentFrame(const QVideoFrame &frame, FrameFlags flags);
+    QAbstractVideoBuffer::HandleType handleType() const;
 
 private Q_SLOTS:
     void onSetSnapshotSize(const QSize &size);
