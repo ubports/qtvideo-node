@@ -1,3 +1,9 @@
+qtvideo-node (0.2.1+15.10.20150710-0ubuntu2~gcc5.1) wily; urgency=medium
+
+  * No-change test rebuild for g++5 ABI transition
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Wed, 22 Jul 2015 23:31:27 +0000
+
 qtvideo-node (0.2.1+15.10.20150710-0ubuntu1) wily; urgency=medium
 
   [ CI Train Bot ]
