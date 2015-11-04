@@ -117,12 +117,12 @@ void tst_ShaderVideoNode::testCameraSetCurrentFrame()
     CameraControl *cc = new CameraControl;
     QVideoFrame frame(new GLTextureBuffer(1), QSize(320, 240), QVideoFrame::Format_RGB32);
 
-    node.setCurrentFrame(frame);
+    node.setCurrentFrame(frame, 0);
     QCOMPARE(QVariant(QMetaType::VoidStar, node.m_material->cameraControl()),
              QVariant(QMetaType::VoidStar, 0));
 
     frame.setMetaData("CamControl", QVariant::fromValue(static_cast<void*>(cc)));
-    node.setCurrentFrame(frame);
+    node.setCurrentFrame(frame, 0);
     QCOMPARE(QVariant(QMetaType::VoidStar, node.m_material->cameraControl()),
              QVariant(QMetaType::VoidStar, cc));
 }
@@ -136,12 +136,12 @@ void tst_ShaderVideoNode::testGLConsumerSetCurrentFrame()
 
     QVideoFrame frame(new GLTextureBuffer(1), QSize(1920, 80), QVideoFrame::Format_RGB32);
 
-    node.setCurrentFrame(frame);
+    node.setCurrentFrame(frame, 0);
 
     std::shared_ptr<core::ubuntu::media::video::Sink> sink{new NullSink()};
 
     frame.setMetaData("GLVideoSink", QVariant::fromValue(sink));
-    node.setCurrentFrame(frame);
+    node.setCurrentFrame(frame, 0);
     QCOMPARE(node.m_material->glVideoSink(), sink);
 
     QVERIFY(m_glConsumerSet == true);
