@@ -1,3 +1,9 @@
+qtvideo-node (0.2.1+16.10.20160725.1-0ubuntu1) yakkety; urgency=medium
+
+  * Port to Qt 5.6. (LP: #1572523)
+
+ -- Timo Jyrinki <timo.jyrinki@canonical.com>  Mon, 25 Jul 2016 16:23:56 +0000
+
 qtvideo-node (0.2.1+16.04.20151104-0ubuntu2~xenial1) xenial; urgency=medium
 
   * No-change rebuild for enabling arm64.
