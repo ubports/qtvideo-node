@@ -19,6 +19,11 @@
 
 #include <QtCore/qdebug.h>
 
+ShaderVideoNodePlugin::~ShaderVideoNodePlugin()
+{
+}
+
+
 QList<QVideoFrame::PixelFormat> ShaderVideoNodePlugin::supportedPixelFormats(
                                         QAbstractVideoBuffer::HandleType handleType) const
 {
