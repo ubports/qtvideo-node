@@ -82,7 +82,12 @@ const char *ShaderVideoShader::vertexShader() const
 const char *ShaderVideoShader::fragmentShader() const
 {
     static const char *shader =
+        "#extension GL_OES_EGL_image_external : enable       \n"
+        "#ifdef GL_OES_EGL_image_external                    \n"
+        "uniform samplerExternalOES sTexture;                \n"
+        "#else                                               \n"
         "uniform sampler2D sTexture;                         \n"
+        "#endif                                              \n"
         "uniform lowp float opacity;                         \n"
         "varying highp vec2 qt_TexCoord;                     \n"
         "void main()                                         \n"
