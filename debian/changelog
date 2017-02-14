@@ -1,3 +1,9 @@
+qtvideo-node (0.2.1+17.04.20170214-0ubuntu1) zesty; urgency=medium
+
+  * Make shader work on desktop
+
+ -- Alfonso Sanchez-Beato <alfonso.sanchez-beato@canonical.com>  Tue, 14 Feb 2017 13:02:00 +0000
+
 qtvideo-node (0.2.1+16.10.20160725.1-0ubuntu1) yakkety; urgency=medium
 
   * Port to Qt 5.6. (LP: #1572523)
