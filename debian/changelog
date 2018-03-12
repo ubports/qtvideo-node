@@ -1,3 +1,9 @@
+qtvideo-node (0.2.2+ubports) xenial; urgency=medium
+
+  * Imported to UBports
+
+ -- UBports auto importer <infra@ubports.com>  Mon, 12 Mar 2018 16:34:40 +0000
+
 qtvideo-node (0.2.1+17.04.20170214-0ubuntu1) zesty; urgency=medium
 
   * Make shader work on desktop
