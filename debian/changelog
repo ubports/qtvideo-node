@@ -1,3 +1,9 @@
+qtvideo-node (0.2.2+ubports) xenial; urgency=medium
+
+  * Imported to UBports
+
+ -- UBports auto importer <infra@ubports.com>  Mon, 18 Jun 2018 21:00:47 +0200
+
 qtvideo-node (0.2.1+15.04.20150828-0ubuntu1) vivid; urgency=medium
 
   [ Jim Hodapp ]
