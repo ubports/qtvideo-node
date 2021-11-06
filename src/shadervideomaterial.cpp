@@ -23,7 +23,7 @@
 #include "shadervideomaterial.h"
 #include "shadervideoshader.h"
 
-#include <core/media/video/sink.h>
+#include <MediaHub/VideoSink>
 
 #include <camera_compatibility_layer.h>
 #include <qtubuntu_media_signals.h>
@@ -36,6 +36,7 @@ ShaderVideoMaterial::ShaderVideoMaterial(const QVideoSurfaceFormat &format)
       m_camControl(0),
       m_textureId(0),
       m_surfaceTextureClient(0),
+      m_videoSink(nullptr),
       m_readyToRender(false),
       m_orientation(SharedSignal::Orientation::rotate0)
 {
@@ -103,14 +104,14 @@ void ShaderVideoMaterial::setSurfaceTextureClient(SurfaceTextureClientHybris sur
     m_surfaceTextureClient = surface_texture_client;
 }
 
-void ShaderVideoMaterial::setGLVideoSink(const std::shared_ptr<core::ubuntu::media::video::Sink>& sink)
+void ShaderVideoMaterial::setGLVideoSink(lomiri::MediaHub::VideoSink &sink)
 {
-    m_videoSink = sink;
+    m_videoSink = &sink;
 }
 
-const std::shared_ptr<core::ubuntu::media::video::Sink>& ShaderVideoMaterial::glVideoSink() const
+lomiri::MediaHub::VideoSink &ShaderVideoMaterial::glVideoSink() const
 {
-    return m_videoSink;
+    return *m_videoSink;
 }
 
 void ShaderVideoMaterial::updateTexture()
@@ -121,13 +122,13 @@ void ShaderVideoMaterial::updateTexture()
 
     if (m_camControl != NULL) {
         android_camera_update_preview_texture(m_camControl);
-        android_camera_get_preview_texture_transformation(m_camControl, m_textureMatrix);
+        android_camera_get_preview_texture_transformation(m_camControl, textureGLMatrix());
     } else if (m_videoSink && !m_readyToRender) {
         m_readyToRender = true;
         return;
     } else if (m_videoSink && m_readyToRender) {
-        if (m_videoSink->swap_buffers()) {
-            m_videoSink->transformation_matrix(static_cast<float*>(m_textureMatrix));
+        if (m_videoSink->swapBuffers()) {
+            m_textureMatrix = m_videoSink->transformationMatrix();
         }
     }
 
@@ -136,8 +137,7 @@ void ShaderVideoMaterial::updateTexture()
         m_orientation == SharedSignal::Orientation::rotate180 ||
         m_orientation == SharedSignal::Orientation::rotate270)
     {
-        memcpy(m_textureMatrix, rotateAndFlip(m_textureMatrix, m_orientation).data(),
-               sizeof(m_textureMatrix));
+        m_textureMatrix = rotateAndFlip(m_textureMatrix, m_orientation);
     }
     else
     {
@@ -161,30 +161,19 @@ void ShaderVideoMaterial::onSinkReset()
 
     // Make sure we free any locked graphics buffer
     if (m_videoSink && m_readyToRender)
-        m_videoSink->swap_buffers();
+        m_videoSink->swapBuffers();
 
-    m_videoSink.reset();
+    m_videoSink = nullptr;
     m_readyToRender = false;
 }
 
-// Takes a GLfloat texture matrix and desired orientation, and outputs a rotated and
+// Takes a texture matrix and desired orientation, and outputs a rotated and
 // horizontally flipped matrix
-QMatrix4x4 ShaderVideoMaterial::rotateAndFlip(GLfloat *m, const SharedSignal::Orientation &orientation)
+QMatrix4x4 ShaderVideoMaterial::rotateAndFlip(const QMatrix4x4 &m, const SharedSignal::Orientation &orientation)
 {
     QMatrix4x4 ret;
 
-    if (m == NULL)
-        return ret;
-
-    /* TODO: Because of the column-to-row major format change, horizontal flips
-     * are really vertical flips, and vice versa. An improvement that needs to happen
-     * to more generically handle any container transformation matrix is to not convert
-     * to row-major format.
-     */
-    QMatrix4x4 qRowMajorTextureMatrix(m[0], m[4], m[8], m[12],
-                                      m[1], m[5], m[9], m[13],
-                                      m[2], m[6], m[10], m[14],
-                                      m[3], m[7], m[11], m[15]);
+    QMatrix4x4 qRowMajorTextureMatrix(m);
     const QMatrix4x4 qFlipH (-1,  0, 0, 1,
                               0,  1, 0, 0,
                               0,  0, 1, 0,
@@ -249,8 +238,9 @@ QMatrix4x4 ShaderVideoMaterial::rotateAndFlip(GLfloat *m, const SharedSignal::Or
     return ret;
 }
 
-void ShaderVideoMaterial::undoAndroidYFlip(GLfloat matrix[])
+void ShaderVideoMaterial::undoAndroidYFlip(QMatrix4x4 &m)
 {
+    float *matrix = m.data();
     // The android matrix flips the y coordinate
     // The android matrix has it's texture coordinates not from 0..1 but in between there
     // The higher value is stored in m[13], the lower one is the higher one minus the height

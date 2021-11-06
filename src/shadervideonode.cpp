@@ -18,6 +18,7 @@
 #include "shadervideomaterial.h"
 #include "snapshotgenerator.h"
 
+#include <MediaHub/VideoSink>
 #include <camera_compatibility_layer.h>
 #include <qtubuntu_media_signals.h>
 #include <surface_texture_client_hybris.h>
@@ -80,9 +81,9 @@ void ShaderVideoNode::setCurrentFrame(const QVideoFrame &frame, FrameFlags flags
         }
         m_material->setCamControl((CameraControl*)ci);
     } else if (frame.availableMetaData().contains("GLVideoSink")) {
-        auto sink = frame.metaData("GLVideoSink").value<std::shared_ptr<core::ubuntu::media::video::Sink>>();
-        qDebug() << "** Setting GLConsumer instance: " << sink.get();
-        m_material->setGLVideoSink(sink);
+        auto sink = frame.metaData("GLVideoSink").value<lomiri::MediaHub::VideoSink*>();
+        qDebug() << "** Setting GLConsumer instance: " << sink;
+        m_material->setGLVideoSink(*sink);
         if (not sink) {
             qWarning() << "No valid GL video sink instance in video frame";
             return;

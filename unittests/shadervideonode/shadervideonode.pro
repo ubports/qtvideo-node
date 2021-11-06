@@ -21,7 +21,8 @@ SOURCES += tst_shadervideonode.cpp \
     ../../src/snapshotgenerator.cpp \
     ../../src/qsgvideonode_p.cpp \
     camera.cpp \
-    player.cpp
+    player.cpp \
+    video_sink.cpp
 
 HEADERS += .  ../../src/shadervideomaterial.h \
     ../../src/shadervideonode.h \
@@ -30,7 +31,8 @@ HEADERS += .  ../../src/shadervideomaterial.h \
     ../../src/private/qtmultimediaquickdefs_p.h \
     ../../src/private/qsgvideonode_p.h \
     camera_compatibility_layer.h \
-    surface_texture_client_hybris.h
+    surface_texture_client_hybris.h \
+    video_sink.h
 
 INCLUDEPATH += ../../src /usr/include/hybris/camera /usr/include/hybris/media /usr/include/libqtubuntu-media-signals
 LIBS += -lqtubuntu-media-signals

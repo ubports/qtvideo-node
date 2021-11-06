@@ -45,7 +45,7 @@ void ShaderVideoShader::updateState(const RenderState &state,
 
     program()->setUniformValue(m_id_texture, 0);
 
-    functions->glUniformMatrix4fv(m_tex_matrix, 1, GL_FALSE, mat->m_textureMatrix);
+    functions->glUniformMatrix4fv(m_tex_matrix, 1, GL_FALSE, mat->textureGLMatrix());
 
     if (state.isOpacityDirty())
         program()->setUniformValue(m_id_opacity, state.opacity());
