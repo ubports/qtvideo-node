@@ -17,12 +17,13 @@
 #include <QtTest/QtTest>
 
 #include <QImage>
+#include <QScopedPointer>
 #include <QVideoFrame>
 #include <QVideoSurfaceFormat>
 
 #include <shadervideomaterial.h>
 
-#include <core/media/video/sink.h>
+#include <MediaHub/VideoSink>
 
 #include <qtubuntu_media_signals.h>
 
@@ -80,19 +81,11 @@ private:
     unsigned int m_textureId;
 };
 
-struct NullSink : public core::ubuntu::media::video::Sink
+struct NullSink : public lomiri::MediaHub::VideoSink
 {
-    const core::Signal<void>& frame_available() const
-    {
-        static core::Signal<void> sig; return sig;
-    }
+    NullSink(): lomiri::MediaHub::VideoSink(nullptr) {}
 
-    bool transformation_matrix(float*) const
-    {
-        return true;
-    }
-
-    bool swap_buffers() const
+    bool swapBuffers() override
     {
         return true;
     }
@@ -138,11 +131,11 @@ void tst_ShaderVideoNode::testGLConsumerSetCurrentFrame()
 
     node.setCurrentFrame(frame, 0);
 
-    std::shared_ptr<core::ubuntu::media::video::Sink> sink{new NullSink()};
+    QScopedPointer<lomiri::MediaHub::VideoSink> sink{new NullSink()};
 
-    frame.setMetaData("GLVideoSink", QVariant::fromValue(sink));
+    frame.setMetaData("GLVideoSink", QVariant::fromValue(sink.data()));
     node.setCurrentFrame(frame, 0);
-    QCOMPARE(node.m_material->glVideoSink(), sink);
+    QCOMPARE(&node.m_material->glVideoSink(), sink.data());
 
     QVERIFY(m_glConsumerSet == true);
 }

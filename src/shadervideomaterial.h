@@ -26,14 +26,15 @@
 #include <qgl.h>
 #include <QMatrix4x4>
 #include <QObject>
+#include <QPointer>
 #include <QVideoSurfaceFormat>
 #include <qtubuntu_media_signals.h>
 
 #include <memory>
 
-namespace core { namespace ubuntu { namespace media { namespace video {
-class Sink;
-} } } }
+namespace lomiri { namespace MediaHub {
+class VideoSink;
+} }
 
 struct CameraControl;
 struct MediaPlayerWrapper;
@@ -59,28 +60,32 @@ public:
     GLuint textureId() const { return m_textureId; }
 
     void setSurfaceTextureClient(SurfaceTextureClientHybris surface_texture_client);
-    void setGLVideoSink(const std::shared_ptr<core::ubuntu::media::video::Sink>& sink);
-    const std::shared_ptr<core::ubuntu::media::video::Sink>& glVideoSink() const;
+    void setGLVideoSink(lomiri::MediaHub::VideoSink &sink);
+    lomiri::MediaHub::VideoSink &glVideoSink() const;
 
     void updateTexture();
 
-    GLfloat m_textureMatrix[16] {};
+    GLfloat *textureGLMatrix() {
+        return static_cast<GLfloat *>(m_textureMatrix.data());
+    }
 
 private Q_SLOTS:
     void onSetOrientation(const SharedSignal::Orientation& orientation, const QSize &size);
     void onSinkReset();
 
 private:
-    QMatrix4x4 rotateAndFlip(GLfloat *m, const SharedSignal::Orientation &orientation);
-    void undoAndroidYFlip(GLfloat matrix[]);
+    QMatrix4x4 rotateAndFlip(const QMatrix4x4 &m,
+                             const SharedSignal::Orientation &orientation);
+    void undoAndroidYFlip(QMatrix4x4 &matrix);
     void printGLMaxtrix(GLfloat matrix[]);
     void printMaxtrix(float matrix[]);
 
     QVideoSurfaceFormat m_format;
     CameraControl *m_camControl;
     GLuint m_textureId;
+    QMatrix4x4 m_textureMatrix;
     SurfaceTextureClientHybris m_surfaceTextureClient;
-    std::shared_ptr<core::ubuntu::media::video::Sink> m_videoSink;
+    QPointer<lomiri::MediaHub::VideoSink> m_videoSink;
     bool m_readyToRender;
     static ShaderVideoShader *m_videoShader; // the shader is cached in the Qt scene graph
     SharedSignal::Orientation m_orientation;

@@ -1,7 +1,8 @@
 TARGET = shadervideonode
 TEMPLATE = lib
-CONFIG += plugin c++11
+CONFIG += plugin c++11 link_pkgconfig
 QT += multimedia opengl quick-private quick
+PKGCONFIG += MediaHub
 
 include(../coverage.pri)
 
@@ -13,7 +14,7 @@ target.path += $$[QT_INSTALL_PLUGINS]/$${PLUGIN_TYPE}
 INSTALLS = target
 
 INCLUDEPATH += /usr/include/hybris/camera /usr/include/hybris/media /usr/include/libqtubuntu-media-signals
-LIBS += -lhybris_ics -lcamera -lmedia -lqtubuntu-media-signals -lmedia-hub-client
+LIBS += -lhybris_ics -lcamera -lmedia -lqtubuntu-media-signals
 
 OTHER_FILES += shadervideonode.json
 
